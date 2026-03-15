@@ -40,7 +40,9 @@ export class DashboardShellComponent {
   onCreateWorkspace() {
     if (this.workspaceForm.valid) {
       this.isSubmitting.set(true);
-      this.workspaceService.createWorkspace(this.workspaceForm.value as any).subscribe({
+      const { name } = this.workspaceForm.value;
+      const payload: any = { name };
+      this.workspaceService.createWorkspace(payload).subscribe({
         next: () => {
           this.isSubmitting.set(false);
           this.sidebarActions.showWorkspaceModal.set(false);

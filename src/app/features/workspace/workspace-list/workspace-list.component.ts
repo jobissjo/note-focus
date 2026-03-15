@@ -25,8 +25,7 @@ export class WorkspaceListComponent implements OnInit {
 
   workspaceForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
-    description: [''],
-    emoji: ['📂']
+    description: ['']
   });
 
   readonly Trash2 = Trash2;
@@ -39,7 +38,7 @@ export class WorkspaceListComponent implements OnInit {
   openCreateModal() {
     this.isEditMode.set(false);
     this.selectedWorkspaceId.set(null);
-    this.workspaceForm.reset({ emoji: '📂' });
+    this.workspaceForm.reset();
     this.showCreateModal.set(true);
   }
 
@@ -48,8 +47,7 @@ export class WorkspaceListComponent implements OnInit {
     this.selectedWorkspaceId.set(workspace.id);
     this.workspaceForm.patchValue({
       name: workspace.name,
-      description: workspace.description || '',
-      emoji: workspace.emoji || '📂'
+      description: workspace.description || ''
     });
     this.showCreateModal.set(true);
   }
@@ -67,15 +65,23 @@ export class WorkspaceListComponent implements OnInit {
   onCreateWorkspace() {
     if (this.workspaceForm.valid) {
       this.isSubmitting.set(true);
+      
+      // Ensure no unwanted data is passed to payload
+      const { name, description } = this.workspaceForm.value;
+      const payload: any = { name };
+      if (description) {
+        payload.description = description;
+      }
+
       const action = this.isEditMode() 
-        ? this.workspaceService.updateWorkspace(this.selectedWorkspaceId()!, this.workspaceForm.value as any)
-        : this.workspaceService.createWorkspace(this.workspaceForm.value as any);
+        ? this.workspaceService.updateWorkspace(this.selectedWorkspaceId()!, payload)
+        : this.workspaceService.createWorkspace(payload);
 
       action.subscribe({
         next: () => {
           this.isSubmitting.set(false);
           this.showCreateModal.set(false);
-          this.workspaceForm.reset({ emoji: '📂' });
+          this.workspaceForm.reset();
         },
         error: () => this.isSubmitting.set(false)
       });
