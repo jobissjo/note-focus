@@ -1,65 +1,84 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { WorkspaceService } from '../../../core/services/workspace.service';
-import { LucideAngularModule, Plus, LayoutGrid, List } from 'lucide-angular';
+import { LucideAngularModule, Plus, LayoutGrid, List, Loader2, Trash2, Edit3, MoreVertical } from 'lucide-angular';
+import { ModalComponent } from '../../../shared/components/modal/modal.component';
+import { AlertService } from '../../../core/services/alert.service';
 
 @Component({
   selector: 'app-workspace-list',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
-  template: `
-    <div class="p-8 max-w-6xl mx-auto">
-      <header class="flex items-center justify-between mb-12">
-        <div>
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Workspaces</h1>
-          <p class="text-neutral-500 dark:text-neutral-400 mt-1">Select or create a workspace to get started</p>
-        </div>
-        <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-500/20 active:scale-95">
-          <lucide-icon [name]="'Plus'" class="h-5 w-5" />
-          <span>New Workspace</span>
-        </button>
-      </header>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @for (workspace of workspaceService.workspaces(); track workspace.id) {
-          <div class="group bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 hover:shadow-2xl hover:border-indigo-500/50 transition-all cursor-pointer">
-            <div class="h-12 w-12 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
-              {{ workspace.emoji || '📂' }}
-            </div>
-            <h3 class="text-lg font-bold text-neutral-900 dark:text-white group-hover:text-indigo-500 transition-colors">{{ workspace.name }}</h3>
-            <p class="text-neutral-500 text-sm mt-1 line-clamp-2">{{ workspace.description || 'No description provided.' }}</p>
-            
-            <div class="mt-6 flex items-center gap-4 text-xs text-neutral-400">
-              <span class="flex items-center gap-1">
-                <lucide-icon [name]="'LayoutGrid'" class="h-3 w-3" />
-                {{ (workspace.notebooks || []).length }} Notebooks
-              </span>
-            </div>
-          </div>
-        }
-
-        <!-- Add Placeholder if empty -->
-        @if (workspaceService.workspaces().length === 0) {
-           <div class="col-span-full py-20 text-center border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-3xl">
-             <div class="h-16 w-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <lucide-icon [name]="'Plus'" class="h-8 w-8 text-neutral-400" />
-             </div>
-             <h3 class="text-xl font-bold">No workspaces found</h3>
-             <p class="text-neutral-500 mt-2">Create your first workspace to start organizing your notes</p>
-           </div>
-        }
-      </div>
-    </div>
-  `
+  imports: [CommonModule, RouterModule, LucideAngularModule, ModalComponent, ReactiveFormsModule],
+  templateUrl: './workspace-list.component.html'
 })
 export class WorkspaceListComponent implements OnInit {
+  private fb = inject(FormBuilder);
   workspaceService = inject(WorkspaceService);
+  private alertService = inject(AlertService);
 
-  readonly Plus = Plus;
-  readonly LayoutGrid = LayoutGrid;
-  readonly List = List;
+  showCreateModal = signal(false);
+  isEditMode = signal(false);
+  selectedWorkspaceId = signal<string | null>(null);
+  isSubmitting = signal(false);
+
+  workspaceForm = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+    description: [''],
+    emoji: ['📂']
+  });
+
+  readonly Trash2 = Trash2;
+  readonly Edit3 = Edit3;
 
   ngOnInit() {
-    this.workspaceService.getWorkspaces().subscribe();
+    // Initial fetch handled by DashboardShell to avoid NG0100
+  }
+
+  openCreateModal() {
+    this.isEditMode.set(false);
+    this.selectedWorkspaceId.set(null);
+    this.workspaceForm.reset({ emoji: '📂' });
+    this.showCreateModal.set(true);
+  }
+
+  openEditModal(workspace: any) {
+    this.isEditMode.set(true);
+    this.selectedWorkspaceId.set(workspace.id);
+    this.workspaceForm.patchValue({
+      name: workspace.name,
+      description: workspace.description || '',
+      emoji: workspace.emoji || '📂'
+    });
+    this.showCreateModal.set(true);
+  }
+
+  async onDeleteWorkspace(workspace: any) {
+    const confirmed = await this.alertService.confirm(
+      'Delete Workspace',
+      `Are you sure you want to delete "${workspace.name}"? This will delete all its notebooks and notes.`
+    );
+    if (confirmed) {
+      this.workspaceService.deleteWorkspace(workspace.id).subscribe();
+    }
+  }
+
+  onCreateWorkspace() {
+    if (this.workspaceForm.valid) {
+      this.isSubmitting.set(true);
+      const action = this.isEditMode() 
+        ? this.workspaceService.updateWorkspace(this.selectedWorkspaceId()!, this.workspaceForm.value as any)
+        : this.workspaceService.createWorkspace(this.workspaceForm.value as any);
+
+      action.subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.showCreateModal.set(false);
+          this.workspaceForm.reset({ emoji: '📂' });
+        },
+        error: () => this.isSubmitting.set(false)
+      });
+    }
   }
 }

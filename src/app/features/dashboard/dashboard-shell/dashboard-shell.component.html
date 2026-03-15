@@ -1,0 +1,73 @@
+<div class="flex h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 overflow-hidden font-sans">
+  <!-- Mobile Overlay -->
+  @if (isMobileMenuOpen()) {
+    <div 
+      (click)="isMobileMenuOpen.set(false)"
+      class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+    ></div>
+  }
+
+  <!-- Sidebar -->
+  <div 
+    class="fixed inset-y-0 left-0 z-50 lg:relative h-full transition-all duration-300 ease-in-out"
+    [class.-left-full]="!isMobileMenuOpen()"
+    [class.lg:left-0]="true"
+  >
+    <app-sidebar class="h-full" />
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col min-w-0 relative">
+    <!-- Mobile Header -->
+    <header class="lg:hidden h-14 border-b border-neutral-200 dark:border-neutral-800 flex items-center px-4 shrink-0 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-xl">
+      <button 
+        (click)="isMobileMenuOpen.set(true)"
+        class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+      >
+        <lucide-icon [name]="'Menu'" class="h-5 w-5" />
+      </button>
+      <div class="ml-4 font-bold tracking-tight">NoteFocus</div>
+    </header>
+
+    <main class="flex-1 relative overflow-y-auto custom-scrollbar">
+      <router-outlet />
+    </main>
+  </div>
+
+  <!-- Global Modals triggered from Sidebar -->
+  @if (sidebarActions.showWorkspaceModal()) {
+    <app-modal title="New Workspace" (close)="sidebarActions.showWorkspaceModal.set(false)">
+      <form [formGroup]="workspaceForm" (ngSubmit)="onCreateWorkspace()" class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Name</label>
+          <input formControlName="name" type="text" placeholder="Marketing, Projects..." class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white" />
+        </div>
+        <div class="flex items-center gap-3 mt-8">
+           <button type="button" (click)="sidebarActions.showWorkspaceModal.set(false)" class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all">Cancel</button>
+           <button [disabled]="workspaceForm.invalid || isSubmitting()" type="submit" class="flex-[2] bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+             @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" /> }
+             <span>Create</span>
+           </button>
+        </div>
+      </form>
+    </app-modal>
+  }
+
+  @if (sidebarActions.showNotebookModal()) {
+    <app-modal [title]="'New Notebook in ' + sidebarActions.selectedWorkspace()?.name" (close)="sidebarActions.showNotebookModal.set(false)">
+      <form [formGroup]="notebookForm" (ngSubmit)="onCreateNotebook()" class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Notebook Name</label>
+          <input formControlName="name" type="text" placeholder="Q1 Goals, Ideas..." class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white" />
+        </div>
+        <div class="flex items-center gap-3 mt-8">
+           <button type="button" (click)="sidebarActions.showNotebookModal.set(false)" class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all">Cancel</button>
+           <button [disabled]="notebookForm.invalid || isSubmitting()" type="submit" class="flex-[2] bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+             @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" /> }
+             <span>Create Notebook</span>
+           </button>
+        </div>
+      </form>
+    </app-modal>
+  }
+</div>

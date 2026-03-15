@@ -1,0 +1,132 @@
+<div class="p-8 max-w-6xl mx-auto">
+  @if (notebookService.activeNotebook(); as notebook) {
+    <header class="mb-12">
+      <div class="flex items-center gap-3 text-sm text-neutral-500 mb-4">
+        <a routerLink="/dashboard" class="hover:text-indigo-500">Dashboard</a>
+        <lucide-icon [name]="'ChevronRight'" class="h-3 w-3" />
+        <a [routerLink]="['/dashboard/workspaces', notebook.workspaceId]" class="hover:text-indigo-500">Workspace</a>
+        <lucide-icon [name]="'ChevronRight'" class="h-3 w-3" />
+        <span class="text-neutral-900 dark:text-white font-medium">{{ notebook.name }}</span>
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="h-16 w-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-3xl">
+            {{ notebook.emoji || '📓' }}
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">{{ notebook.name }}</h1>
+            <p class="text-neutral-500 dark:text-neutral-400 mt-1">Collection of your thoughts and notes.</p>
+          </div>
+        </div>
+        
+        <button 
+          (click)="createNewNote()"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
+        >
+          <lucide-icon [name]="'Plus'" class="h-5 w-5" />
+          <span>Create Note</span>
+        </button>
+      </div>
+    </header>
+
+    <section>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (note of notes(); track note.id) {
+          <div 
+            class="group relative bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 hover:shadow-xl hover:border-indigo-500/50 transition-all"
+          >
+            <!-- Actions Hover Menu -->
+            <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <button 
+                (click)="previewNote(note)"
+                class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 transition-colors shadow-sm"
+                title="Preview"
+              >
+                <lucide-icon [name]="'Eye'" class="h-4 w-4" />
+              </button>
+              <a 
+                [routerLink]="['/dashboard/notes', note.id]"
+                class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 text-indigo-600 dark:text-indigo-400 transition-colors shadow-sm"
+                title="Edit"
+              >
+                <lucide-icon [name]="'Edit3'" class="h-4 w-4" />
+              </a>
+              <button 
+                (click)="deleteNote(note)"
+                class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors shadow-sm"
+                title="Delete"
+              >
+                <lucide-icon [name]="'Trash2'" class="h-4 w-4" />
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-2xl group-hover:scale-110 transition-transform">{{ note.emoji || '📄' }}</div>
+              <span class="text-[10px] text-neutral-400 uppercase font-bold tracking-widest">{{ note.updatedAt | date:'MMM d' }}</span>
+            </div>
+            <h3 class="font-bold text-neutral-900 dark:text-white truncate group-hover:text-indigo-500 transition-colors">{{ note.title || 'Untitled Note' }}</h3>
+            <p class="text-xs text-neutral-500 mt-2 line-clamp-3 leading-relaxed">{{ getPlainTextField(note) || 'No content yet...' }}</p>
+            
+            <div class="mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
+               <div class="flex -space-x-2">
+                 <div class="h-6 w-6 rounded-full border-2 border-white dark:border-neutral-900 bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-[10px] font-bold text-indigo-600">
+                   JP
+                 </div>
+               </div>
+               <button 
+                [routerLink]="['/dashboard/notes', note.id]"
+                class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 hover:underline"
+               >
+                 View Note
+               </button>
+            </div>
+          </div>
+        }
+
+        @if (notes().length === 0) {
+          <div class="col-span-full py-20 text-center border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-3xl">
+            <lucide-icon [name]="'StickyNote'" class="h-12 w-12 text-neutral-300 mx-auto mb-4" />
+            <h3 class="text-lg font-bold">No notes here yet</h3>
+            <p class="text-neutral-500 text-sm mt-1">Start by creating your first note in this notebook.</p>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Note Preview Modal -->
+    @if (selectedNote()) {
+      <app-modal [title]="selectedNote()?.title || 'Note Preview'" (close)="selectedNote.set(null)">
+        <div class="max-h-[60vh] overflow-y-auto custom-scrollbar">
+          <div class="prose dark:prose-invert max-w-none">
+             <p class="whitespace-pre-wrap text-neutral-700 dark:text-neutral-300 leading-relaxed">
+               {{ getPlainTextField(selectedNote()!) }}
+             </p>
+             @if (!getPlainTextField(selectedNote()!)) {
+                <div class="py-12 text-center text-neutral-400">
+                  <lucide-icon [name]="'StickyNote'" class="h-12 w-12 mx-auto mb-4 opacity-20" />
+                  <p>This note is empty.</p>
+                </div>
+             }
+          </div>
+        </div>
+        <div class="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+           <button 
+            (click)="selectedNote.set(null)"
+            class="px-4 py-2 text-sm font-bold text-neutral-500 hover:text-neutral-700 transition-colors"
+           >
+             Close
+           </button>
+           <a 
+            [routerLink]="['/dashboard/notes', selectedNote()?.id]"
+            (click)="selectedNote.set(null)"
+            class="bg-indigo-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all flex items-center gap-2"
+           >
+             <lucide-icon [name]="'ExternalLink'" class="h-4 w-4" />
+             Open Editor
+           </a>
+        </div>
+      </app-modal>
+    }
+  }
+</div>

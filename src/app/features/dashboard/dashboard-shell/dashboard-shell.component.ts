@@ -2,59 +2,71 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
-import { LucideAngularModule, Menu, X } from 'lucide-angular';
+import { LucideAngularModule, Menu, X, Loader2 } from 'lucide-angular';
+import { SidebarActionsService } from '../../../core/services/sidebar-actions.service';
+import { WorkspaceService } from '../../../core/services/workspace.service';
+import { NotebookService } from '../../../core/services/notebook.service';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ModalComponent } from '../../../shared/components/modal/modal.component';
 
 @Component({
   selector: 'app-dashboard-shell',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SidebarComponent, LucideAngularModule],
-  template: `
-    <div class="flex h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 overflow-hidden font-sans">
-      <!-- Mobile Overlay -->
-      @if (isMobileMenuOpen()) {
-        <div 
-          (click)="isMobileMenuOpen.set(false)"
-          class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden transition-opacity"
-        ></div>
-      }
-
-      <!-- Sidebar -->
-      <div 
-        class="fixed inset-y-0 left-0 z-50 transform lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out"
-        [class.-translate-x-full]="!isMobileMenuOpen()"
-      >
-        <app-sidebar class="h-full" />
-      </div>
-
-      <!-- Main Content -->
-      <div class="flex-1 flex flex-col min-w-0 relative">
-        <!-- Mobile Header -->
-        <header class="lg:hidden h-14 border-b border-neutral-200 dark:border-neutral-800 flex items-center px-4 shrink-0 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-xl">
-          <button 
-            (click)="isMobileMenuOpen.set(true)"
-            class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
-          >
-            <lucide-icon [name]="'Menu'" class="h-5 w-5" />
-          </button>
-          <div class="ml-4 font-bold tracking-tight">NoteFocus</div>
-        </header>
-
-        <main class="flex-1 relative overflow-y-auto custom-scrollbar">
-          <router-outlet />
-        </main>
-      </div>
-    </div>
-  `,
-  styles: [`
-    :host {
-      display: block;
-      height: 100vh;
-    }
-  `]
+  imports: [CommonModule, RouterOutlet, SidebarComponent, LucideAngularModule, ModalComponent, ReactiveFormsModule],
+  templateUrl: './dashboard-shell.component.html',
+  styleUrls: ['./dashboard-shell.component.css']
 })
 export class DashboardShellComponent {
+  private fb = inject(FormBuilder);
+  sidebarActions = inject(SidebarActionsService);
+  workspaceService = inject(WorkspaceService);
+  notebookService = inject(NotebookService);
+
   isMobileMenuOpen = signal(false);
+  isSubmitting = signal(false);
+
+  workspaceForm = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+  });
+
+  notebookForm = this.fb.group({
+    name: ['', [Validators.required, Validators.minLength(2)]],
+  });
+
+  ngOnInit() {
+    this.workspaceService.getWorkspaces().subscribe();
+  }
+
+  onCreateWorkspace() {
+    if (this.workspaceForm.valid) {
+      this.isSubmitting.set(true);
+      this.workspaceService.createWorkspace(this.workspaceForm.value as any).subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.sidebarActions.showWorkspaceModal.set(false);
+          this.workspaceForm.reset();
+        },
+        error: () => this.isSubmitting.set(false)
+      });
+    }
+  }
+
+  onCreateNotebook() {
+    const ws = this.sidebarActions.selectedWorkspace();
+    if (this.notebookForm.valid && ws) {
+      this.isSubmitting.set(true);
+      this.notebookService.createNotebook(ws.id, this.notebookForm.value as any).subscribe({
+        next: () => {
+          this.isSubmitting.set(false);
+          this.sidebarActions.showNotebookModal.set(false);
+          this.notebookForm.reset();
+        },
+        error: () => this.isSubmitting.set(false)
+      });
+    }
+  }
 
   readonly Menu = Menu;
   readonly X = X;
+  readonly Loader2 = Loader2;
 }

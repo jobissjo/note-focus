@@ -1,0 +1,165 @@
+<div class="p-8 max-w-6xl mx-auto">
+  @if (workspaceService.activeWorkspace(); as workspace) {
+    <header class="mb-12">
+      <div class="flex items-center gap-3 text-sm text-neutral-500 mb-4">
+        <a routerLink="/dashboard" class="hover:text-indigo-500">Dashboard</a>
+        <lucide-icon [name]="'ChevronRight'" class="h-3 w-3" />
+        <span class="text-neutral-900 dark:text-white font-medium">{{ workspace.name }}</span>
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="h-16 w-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-3xl">
+            {{ workspace.emoji || '📂' }}
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">{{ workspace.name }}</h1>
+            <p class="text-neutral-500 dark:text-neutral-400 mt-1">{{ workspace.description || 'Manage your notebooks and notes.' }}</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button 
+            (click)="openEditModal(workspace)"
+            class="p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"
+            title="Edit Workspace"
+          >
+            <lucide-icon [name]="'Edit3'" class="h-5 w-5" />
+          </button>
+          <button 
+            (click)="onDeleteWorkspace(workspace)"
+            class="p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors text-red-500"
+            title="Delete Workspace"
+          >
+            <lucide-icon [name]="'Trash2'" class="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold">Notebooks</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        @for (notebook of notebooks(); track notebook.id) {
+          <div 
+            class="group relative bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 hover:shadow-xl hover:border-indigo-500/50 transition-all"
+          >
+            <!-- Notebook Actions -->
+            <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+               <button 
+                (click)="openEditNotebook(notebook)"
+                class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 shadow-sm"
+                title="Edit Notebook"
+              >
+                <lucide-icon [name]="'Edit3'" class="h-4 w-4" />
+              </button>
+              <button 
+                (click)="onDeleteNotebook(notebook)"
+                class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 text-red-500 shadow-sm"
+                title="Delete Notebook"
+              >
+                <lucide-icon [name]="'Trash2'" class="h-4 w-4" />
+              </button>
+            </div>
+
+            <div 
+              [routerLink]="['/dashboard/notebooks', notebook.id]"
+              class="cursor-pointer flex items-center gap-4"
+            >
+              <div class="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <lucide-icon [name]="'Notebook'" class="h-5 w-5" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="font-bold text-neutral-900 dark:text-white truncate group-hover:text-indigo-500 transition-colors">{{ notebook.name }}</h3>
+                <p class="text-xs text-neutral-500 mt-0.5">{{ (notebook.notes || []).length }} Notes</p>
+              </div>
+              <lucide-icon [name]="'ChevronRight'" class="h-4 w-4 text-neutral-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+            </div>
+          </div>
+        }
+
+        <!-- Create Notebook Card -->
+        <button 
+          (click)="showCreateModal.set(true)"
+          class="border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 hover:border-indigo-500/50 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-all group flex items-center gap-4 text-left"
+        >
+          <div class="h-10 w-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-400 group-hover:text-indigo-500 flex items-center justify-center transition-colors">
+            <lucide-icon [name]="'Plus'" class="h-5 w-5" />
+          </div>
+          <span class="font-bold text-neutral-400 group-hover:text-indigo-500 transition-colors">New Notebook</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- New Notebook Modal -->
+    @if (showCreateModal()) {
+      <app-modal [title]="'New Notebook in ' + workspace.name" (close)="showCreateModal.set(false)">
+        <form [formGroup]="notebookForm" (ngSubmit)="onCreateNotebook()" class="space-y-6">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Notebook Name</label>
+            <input formControlName="name" type="text" placeholder="Q1 Goals, Ideas..." class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white" />
+          </div>
+          <div class="flex items-center gap-3 mt-8">
+             <button type="button" (click)="showCreateModal.set(false)" class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all">Cancel</button>
+             <button [disabled]="notebookForm.invalid || isSubmitting()" type="submit" class="flex-[2] bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+               @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" /> }
+               <span>Create Notebook</span>
+             </button>
+          </div>
+        </form>
+      </app-modal>
+    }
+
+    <!-- Edit Notebook Modal -->
+    @if (showEditNotebookModal()) {
+      <app-modal [title]="'Edit Notebook'" (close)="showEditNotebookModal.set(false)">
+        <form [formGroup]="notebookForm" (ngSubmit)="onUpdateNotebook()" class="space-y-6">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Notebook Name</label>
+            <input formControlName="name" type="text" class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white" />
+          </div>
+          <div class="flex items-center gap-3 mt-8">
+             <button type="button" (click)="showEditNotebookModal.set(false)" class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all">Cancel</button>
+             <button [disabled]="notebookForm.invalid || isSubmitting()" type="submit" class="flex-[2] bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+               @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" /> }
+               <span>Save Changes</span>
+             </button>
+          </div>
+        </form>
+      </app-modal>
+    }
+
+    <!-- Edit Workspace Modal -->
+    @if (showEditModal()) {
+      <app-modal title="Edit Workspace" (close)="showEditModal.set(false)">
+        <form [formGroup]="workspaceForm" (ngSubmit)="onUpdateWorkspace()" class="space-y-6">
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Workspace Name</label>
+            <input formControlName="name" type="text" class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white" />
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Description</label>
+            <textarea formControlName="description" rows="3" class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white resize-none"></textarea>
+          </div>
+          <div class="flex items-center gap-3 mt-8">
+             <button type="button" (click)="showEditModal.set(false)" class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all">Cancel</button>
+             <button [disabled]="workspaceForm.invalid || isSubmitting()" type="submit" class="flex-[2] bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
+               @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" /> }
+               <span>Save Changes</span>
+             </button>
+          </div>
+        </form>
+      </app-modal>
+    }
+  } @else {
+    <div class="flex items-center justify-center h-64">
+      <div class="animate-pulse flex flex-col items-center gap-4">
+        <div class="h-12 w-12 bg-neutral-200 dark:bg-neutral-800 rounded-full"></div>
+        <div class="h-4 w-32 bg-neutral-200 dark:bg-neutral-800 rounded"></div>
+      </div>
+    </div>
+  }
+</div>

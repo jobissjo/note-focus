@@ -1,86 +1,34 @@
 import { Component, inject, OnDestroy, OnInit, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { BreadcrumbService } from '../../../core/services/breadcrumb.service';
 import { NoteService } from '../../../core/services/note.service';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
 import { FormsModule } from '@angular/forms';
-import { LucideAngularModule, Save, Clock, Trash2, Maximize2, Share2 } from 'lucide-angular';
+import { LucideAngularModule, Save, Clock, Trash2, Maximize2, Share2, Loader2, ChevronRight } from 'lucide-angular';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { AlertService } from '../../../core/services/alert.service';
 
 @Component({
   selector: 'app-note-editor',
   standalone: true,
-  imports: [CommonModule, NgxEditorModule, FormsModule, LucideAngularModule],
-  template: `
-    <div class="h-full flex flex-col bg-white dark:bg-neutral-950">
-      <!-- Top Bar -->
-      <header class="h-14 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-6 shrink-0">
-        <div class="flex items-center gap-4">
-          <div class="text-xl">{{ noteService.activeNote()?.emoji || '📄' }}</div>
-          <input 
-            [ngModel]="noteService.activeNote()?.title"
-            (ngModelChange)="updateTitle($event)"
-            class="bg-transparent border-none outline-none font-bold text-lg w-64 focus:ring-0 placeholder:text-neutral-400"
-            placeholder="Untitled Note"
-          />
-        </div>
-
-        <div class="flex items-center gap-2">
-          <div class="flex items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-500 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
-             <lucide-icon [name]="'Clock'" class="h-3.5 w-3.5" />
-             <span>Saved just now</span>
-          </div>
-          <div class="w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-1"></div>
-          <button class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors">
-            <lucide-icon [name]="'Share2'" class="h-4 w-4" />
-          </button>
-          <button class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors">
-            <lucide-icon [name]="'Maximize2'" class="h-4 w-4" />
-          </button>
-          <button class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 transition-colors">
-            <lucide-icon [name]="'Trash2'" class="h-4 w-4" />
-          </button>
-        </div>
-      </header>
-
-      <!-- Editor Area -->
-      <div class="flex-1 overflow-y-auto px-4 py-8">
-        <div class="max-w-4xl mx-auto">
-          <div class="editor-container prose dark:prose-invert max-w-none">
-            @if (isBrowser) {
-              <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
-              <ngx-editor
-                [editor]="editor"
-                [ngModel]="content()"
-                (ngModelChange)="onContentChange($event)"
-                [placeholder]="'Type something awesome...'"
-              ></ngx-editor>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    @reference "tailwindcss";
-    :host ::ng-deep {
-      .NgxEditor__MenuBar {
-        @apply bg-transparent border-none p-0 mb-8 sticky top-0 z-10 backdrop-blur-md;
-      }
-      .NgxEditor__MenuItem--Icon {
-        @apply rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors;
-      }
-      .NgxEditor__Content {
-        @apply border-none p-0 focus:ring-0 min-h-[500px];
-      }
-    }
-  `]
+  imports: [CommonModule, NgxEditorModule, FormsModule, LucideAngularModule, RouterModule],
+  templateUrl: './note-editor.component.html',
+  styleUrls: ['./note-editor.component.css']
 })
 export class NoteEditorComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
   noteService = inject(NoteService);
+  breadcrumbService = inject(BreadcrumbService);
+  private alertService = inject(AlertService);
   isBrowser = isPlatformBrowser(this.platformId);
+
+  private destroy$ = new Subject<void>();
+  private saveSubject = new Subject<{ title?: string; content?: any }>();
+  isSaving = signal(false);
 
   editor!: Editor;
   toolbar: Toolbar = [
@@ -101,12 +49,21 @@ export class NoteEditorComponent implements OnInit, OnDestroy {
   readonly Trash2 = Trash2;
   readonly Maximize2 = Maximize2;
   readonly Share2 = Share2;
+  readonly Loader2 = Loader2;
 
   ngOnInit(): void {
     if (this.isBrowser) {
       this.editor = new Editor();
+
+      this.saveSubject.pipe(
+        debounceTime(1000),
+        takeUntil(this.destroy$)
+      ).subscribe(data => {
+        this.saveNote(data);
+      });
     }
-    this.route.params.subscribe(params => {
+
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = params['id'];
       if (id) {
         this.noteService.getNoteById(id).subscribe(note => {
@@ -116,7 +73,23 @@ export class NoteEditorComponent implements OnInit, OnDestroy {
     });
   }
 
+  private saveNote(data: { title?: string; content?: any }) {
+    const note = this.noteService.activeNote();
+    if (!note) return;
+
+    this.isSaving.set(true);
+    // Try to find notebook/workspace IDs from current state if available, 
+    // though the service could also find them if we pass them.
+    // For now, let's assume the service can handle it or we pass what we have.
+    this.noteService.updateNote(note.id, note.notebookId, '', data).subscribe({ // workspaceId empty for now if not easily found
+      next: () => this.isSaving.set(false),
+      error: () => this.isSaving.set(false)
+    });
+  }
+
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     if (this.editor) {
       this.editor.destroy();
     }
@@ -124,17 +97,26 @@ export class NoteEditorComponent implements OnInit, OnDestroy {
 
   onContentChange(newContent: any) {
     this.content.set(newContent);
-    // Auto-save logic here
-    const noteId = this.noteService.activeNote()?.id;
-    if (noteId) {
-      this.noteService.updateNote(noteId, { content: newContent }).subscribe();
-    }
+    this.saveSubject.next({ content: newContent });
   }
 
   updateTitle(newTitle: string) {
-    const noteId = this.noteService.activeNote()?.id;
-    if (noteId) {
-      this.noteService.updateNote(noteId, { title: newTitle }).subscribe();
+    this.saveSubject.next({ title: newTitle });
+  }
+
+  async onDeleteNote() {
+    const note = this.noteService.activeNote();
+    if (!note) return;
+
+    const confirmed = await this.alertService.confirm(
+      'Delete Note',
+      `Are you sure you want to delete "${note.title || 'this note'}"?`
+    );
+
+    if (confirmed) {
+      this.noteService.deleteNote(note.id, note.notebookId, '').subscribe(() => {
+        this.router.navigate(['/dashboard']);
+      });
     }
   }
 }

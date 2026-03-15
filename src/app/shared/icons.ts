@@ -20,7 +20,13 @@ import {
   Maximize2,
   Share2,
   Menu,
-  X
+  X,
+  User,
+  Edit3,
+  Eye,
+  ExternalLink,
+  Sun,
+  Moon
 } from 'lucide-angular';
 
 export const ICONS = {
@@ -45,5 +51,11 @@ export const ICONS = {
   Maximize2,
   Share2,
   Menu,
-  X
+  X,
+  User,
+  Edit3,
+  Eye,
+  ExternalLink,
+  Sun,
+  Moon
 };

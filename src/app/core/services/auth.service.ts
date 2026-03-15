@@ -52,7 +52,7 @@ export class AuthService extends BaseApiService {
 
   private handleAuthSub(res: AuthResponse) {
     if (this.isBrowser) {
-      localStorage.setItem('token', res.accessToken);
+      localStorage.setItem('token', res.accessToken || res?.access_token || '');
       localStorage.setItem('user', JSON.stringify(res.user));
     }
     this.currentUser.set(res.user);
