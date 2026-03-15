@@ -1,0 +1,114 @@
+<div class="p-8 max-w-6xl mx-auto">
+  <header class="flex items-center justify-between mb-12">
+    <div>
+      <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Journals</h1>
+      <p class="text-neutral-500 dark:text-neutral-400 mt-1">Capture your thoughts, daily updates, or logs in a timeline structure.</p>
+    </div>
+    <button 
+      (click)="openCreateModal()"
+      class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-purple-500/20 active:scale-95"
+    >
+      <lucide-icon [name]="'Plus'" class="h-5 w-5" />
+      <span>New Journal</span>
+    </button>
+  </header>
+
+  <!-- Create/Edit Modal -->
+  @if (showCreateModal()) {
+    <app-modal [title]="activeDiaryForEdit() ? 'Edit Journal' : 'Create New Journal'" (close)="showCreateModal.set(false)">
+      <form [formGroup]="diaryForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Journal Name</label>
+          <input 
+            formControlName="name"
+            type="text" 
+            placeholder="Daily Log, Captain's Log..."
+            class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-purple-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white"
+          />
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Description (Optional)</label>
+          <textarea 
+            formControlName="description"
+            rows="3"
+            placeholder="What's this journal about?"
+            class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-purple-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white resize-none"
+          ></textarea>
+        </div>
+
+        <div class="flex items-center gap-3">
+           <button 
+            type="button"
+            (click)="showCreateModal.set(false)"
+            class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all"
+           >
+             Cancel
+           </button>
+           <button 
+            [disabled]="diaryForm.invalid || isSubmitting()"
+            type="submit"
+            class="flex-[2] bg-purple-600 text-white font-bold py-3.5 rounded-xl hover:bg-purple-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20"
+           >
+             @if (isSubmitting()) {
+               <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" />
+               <span>Saving...</span>
+             } @else {
+               <span>Save Journal</span>
+             }
+           </button>
+        </div>
+      </form>
+    </app-modal>
+  }
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    @for (diary of diaryService.diaries(); track diary.id) {
+      <div 
+        class="group relative bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 hover:shadow-2xl hover:border-purple-500/50 transition-all cursor-pointer"
+      >
+        <!-- Actions -->
+        <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+           <button 
+            (click)="$event.stopPropagation(); openEditModal(diary)"
+            class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 shadow-sm"
+          >
+            <lucide-icon [name]="'Edit3'" class="h-4 w-4" />
+          </button>
+          <button 
+            (click)="$event.stopPropagation(); onDeleteDiary(diary)"
+            class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 text-red-500 shadow-sm"
+          >
+            <lucide-icon [name]="'Trash2'" class="h-4 w-4" />
+          </button>
+        </div>
+
+        <div [routerLink]="['/dashboard/diaries', diary.id]">
+          <div class="h-12 w-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-4 group-hover:scale-110 transition-transform">
+            <lucide-icon [name]="'Book'" class="h-6 w-6" />
+          </div>
+          <h3 class="text-lg font-bold text-neutral-900 dark:text-white group-hover:text-purple-500 transition-colors">{{ diary.name }}</h3>
+          <p class="text-neutral-500 text-sm mt-1 line-clamp-2">{{ diary.description || 'No description provided.' }}</p>
+          
+          <div class="mt-6 flex items-center gap-4 text-xs text-neutral-400">
+            <span class="flex items-center gap-1">
+              <lucide-icon [name]="'List'" class="h-3 w-3" />
+              <!-- {{ (diary.entries || []).length }} Entries --> Timeline View
+            </span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Add Placeholder if empty -->
+    @if (diaryService.diaries().length === 0) {
+       <div class="col-span-full py-20 text-center border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-3xl">
+         <div class="h-16 w-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <lucide-icon [name]="'Plus'" class="h-8 w-8 text-neutral-400" />
+         </div>
+         <h3 class="text-xl font-bold">No journals found</h3>
+         <p class="text-neutral-500 mt-2">Create your first journal to start your daily entries</p>
+       </div>
+    }
+  </div>
+</div>

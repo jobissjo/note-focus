@@ -1,0 +1,169 @@
+<div class="h-full flex bg-neutral-50 dark:bg-neutral-950 font-sans">
+  
+  <!-- Timeline Sidebar (Entries) -->
+  <aside class="w-80 h-full border-r border-neutral-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-xl flex flex-col shrink-0">
+    <!-- Header -->
+    <div class="p-4 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2 min-w-0">
+        <button [routerLink]="['/dashboard/diaries']" class="p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors shrink-0">
+          <lucide-icon [name]="'ChevronRight'" class="h-4 w-4 rotate-180" />
+        </button>
+        <span class="font-bold text-neutral-900 dark:text-white truncate">{{ diaryService.activeDiary()?.name || 'Loading...' }}</span>
+      </div>
+      <button 
+        (click)="openCreateEntryModal()"
+        class="p-1.5 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-900/50 rounded-lg transition-colors shrink-0"
+      >
+        <lucide-icon [name]="'Plus'" class="h-4 w-4" />
+      </button>
+    </div>
+
+    <!-- entries list -->
+    <div class="flex-1 overflow-y-auto px-2 py-4 space-y-2 custom-scrollbar">
+      @for (entry of diaryEntryService.entries(); track entry.id) {
+        <div 
+          class="relative group cursor-pointer p-3 rounded-xl transition-all border"
+          [class]="diaryEntryService.activeEntry()?.id === entry.id ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800' : 'bg-transparent border-transparent hover:bg-neutral-100 dark:hover:bg-neutral-800'"
+          (click)="selectEntry(entry)"
+        >
+          <div class="flex items-start justify-between">
+             <div>
+               <div class="text-[10px] font-bold tracking-wider text-purple-500 uppercase mb-1">{{ entry.date | date:'longDate' }}</div>
+               <div class="text-sm font-semibold text-neutral-900 dark:text-white line-clamp-1">{{ entry.title || 'Untitled Entry' }}</div>
+             </div>
+             
+             <!-- Actions (edit, delete) on hover -->
+             <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+               <button (click)="$event.stopPropagation(); openEditEntryModal(entry)" class="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-500 rounded">
+                 <lucide-icon [name]="'Edit3'" class="h-3 w-3" />
+               </button>
+               <button (click)="$event.stopPropagation(); onDeleteEntry(entry)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 text-red-500 rounded">
+                 <lucide-icon [name]="'Trash2'" class="h-3 w-3" />
+               </button>
+             </div>
+          </div>
+        </div>
+      }
+
+      @if (diaryEntryService.entries().length === 0) {
+        <div class="text-center py-10 px-4">
+           <div class="h-12 w-12 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-3 text-neutral-400">
+             <lucide-icon [name]="'Edit3'" class="h-5 w-5" />
+           </div>
+           <p class="text-sm text-neutral-500">No entries yet.<br>Click '+' to write your first daily log.</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Main RTE Area -->
+  <main class="flex-1 flex flex-col relative min-w-0 bg-white dark:bg-neutral-950">
+    @if (diaryEntryService.activeEntry(); as activeEntry) {
+      <header class="h-14 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-6 shrink-0 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-xl sticky top-0 z-30">
+        <div class="flex items-center gap-4 min-w-0">
+          <div class="text-xs font-bold px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-md">
+            {{ activeEntry.date | date:'fullDate' }}
+          </div>
+          <h2 class="font-bold text-lg text-neutral-900 dark:text-white truncate">{{ activeEntry.title || 'Untitled Entry' }}</h2>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-500 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+             <lucide-icon [name]="isSaving() ? 'Loader2' : 'Clock'" [class.animate-spin]="isSaving()" class="h-3.5 w-3.5" />
+             <span>{{ isSaving() ? 'Saving...' : 'Saved' }}</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Editor Base -->
+      <div class="flex-1 overflow-y-auto px-4 py-8 custom-scrollbar">
+        <div class="max-w-3xl mx-auto">
+          <div class="editor-container transition-all duration-300">
+            @if (isBrowser) {
+              <div class="sticky top-2 z-20 bg-neutral-50/90 dark:bg-neutral-950/90 backdrop-blur-md pt-2 pb-6 rounded-b">
+                <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
+              </div>
+              
+              <div class="prose dark:prose-invert max-w-none mt-4">
+                <ngx-editor
+                  [editor]="editor"
+                  [ngModel]="activeEntry.content"
+                  (ngModelChange)="onContentChange($event)"
+                  [placeholder]="'Start writing your thoughts for ' + (activeEntry.date | date:'longDate') + '...'"
+                ></ngx-editor>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- Empty State -->
+       <div class="flex-1 flex flex-col items-center justify-center text-center p-8">
+         <div class="bg-neutral-100 dark:bg-neutral-800 h-24 w-24 rounded-full flex items-center justify-center text-neutral-400 mb-6 group-hover:scale-110 transition-transform shadow-inner">
+           <lucide-icon [name]="'Book'" class="h-10 w-10 text-purple-500/50" />
+         </div>
+         <h2 class="text-2xl font-bold text-neutral-900 dark:text-white mb-2">Select or create an entry</h2>
+         <p class="text-neutral-500 max-w-sm mb-8">
+           Journals help you keep a timeline of notes, meetings, and thoughts organized by date.
+         </p>
+         <button 
+          (click)="openCreateEntryModal()"
+          class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-purple-500/20 active:scale-95"
+        >
+          <lucide-icon [name]="'Plus'" class="h-5 w-5" />
+          <span>Write a New Entry</span>
+        </button>
+       </div>
+    }
+  </main>
+
+  <!-- Create/Edit Entry Modal -->
+  @if (showEntryModal()) {
+    <app-modal [title]="activeEntryForEdit() ? 'Edit Entry Details' : 'New Journal Entry'" (close)="showEntryModal.set(false)">
+      <form [formGroup]="entryModalForm" (ngSubmit)="onSubmitEntry()" class="space-y-6">
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Date</label>
+          <input 
+            formControlName="date"
+            type="date" 
+            class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-purple-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white"
+          />
+          <p class="text-xs text-neutral-500 mt-1">Select the date this entry belongs to.</p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Title (Optional)</label>
+          <input 
+            formControlName="title"
+            type="text" 
+            placeholder="E.g., Weekly Sync, Big Ideas..."
+            class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-purple-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white"
+          />
+        </div>
+
+        <div class="flex items-center gap-3 mt-8">
+           <button 
+            type="button"
+            (click)="showEntryModal.set(false)"
+            class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all"
+           >
+             Cancel
+           </button>
+           <button 
+            [disabled]="entryModalForm.invalid || isSubmitting()"
+            type="submit"
+            class="flex-[2] bg-purple-600 text-white font-bold py-3.5 rounded-xl hover:bg-purple-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20"
+           >
+             @if (isSubmitting()) {
+               <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" />
+               <span>Saving...</span>
+             } @else {
+               <span>Save Details</span>
+             }
+           </button>
+        </div>
+      </form>
+    </app-modal>
+  }
+
+</div>

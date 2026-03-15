@@ -26,7 +26,11 @@ import {
   Eye,
   ExternalLink,
   Sun,
-  Moon
+  Moon,
+  Book,
+  Palette,
+  Bell,
+  AlertTriangle
 } from 'lucide-angular';
 
 export const ICONS = {
@@ -57,5 +61,9 @@ export const ICONS = {
   Eye,
   ExternalLink,
   Sun,
-  Moon
+  Moon,
+  Book,
+  Palette,
+  Bell,
+  AlertTriangle
 };

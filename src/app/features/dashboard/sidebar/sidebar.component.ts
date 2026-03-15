@@ -1,13 +1,14 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { LucideAngularModule, ChevronRight, ChevronDown, Plus, Hash, Notebook as NotebookIcon, StickyNote, Settings, LogOut, Search, Command, Loader2, Sun, Moon } from 'lucide-angular';
+import { LucideAngularModule, ChevronRight, ChevronDown, Plus, Hash, Notebook as NotebookIcon, StickyNote, Settings, LogOut, Search, Command, Loader2, Sun, Moon, Book } from 'lucide-angular';
 import { WorkspaceService } from '../../../core/services/workspace.service';
 import { NotebookService } from '../../../core/services/notebook.service';
 import { NoteService } from '../../../core/services/note.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { SidebarActionsService } from '../../../core/services/sidebar-actions.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { DiaryService } from '../../../core/services/diary.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -16,7 +17,7 @@ import { ThemeService } from '../../../core/services/theme.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   private router = inject(Router);
   workspaceService = inject(WorkspaceService);
   notebookService = inject(NotebookService);
@@ -24,10 +25,12 @@ export class SidebarComponent {
   authService = inject(AuthService);
   sidebarActions = inject(SidebarActionsService);
   themeService = inject(ThemeService);
+  diaryService = inject(DiaryService);
 
   isCollapsed = signal(false);
   expandedWorkspaces = signal<Set<string>>(new Set());
   expandedNotebooks = signal<Set<string>>(new Set());
+  expandedDiaries = signal<Set<string>>(new Set());
 
   readonly ChevronRight = ChevronRight;
   readonly ChevronDown = ChevronDown;
@@ -42,6 +45,11 @@ export class SidebarComponent {
   readonly Loader2 = Loader2;
   readonly Sun = Sun;
   readonly Moon = Moon;
+  readonly Book = Book;
+
+  ngOnInit() {
+    this.diaryService.fetchDiaries().subscribe();
+  }
 
   createNote(workspaceId: string, notebookId: string) {
     this.noteService.createNote(notebookId, workspaceId, { 

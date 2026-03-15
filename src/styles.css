@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@custom-variant dark (&:where(.dark, .dark *));
 @layer base {
   body {
     @apply font-sans antialiased text-neutral-900 bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-950;
@@ -30,4 +30,47 @@
 .dark {
   --primary: #6366f1;
   --primary-foreground: #ffffff;
+}
+
+/* ngx-editor Dark Mode Overrides */
+.dark .NgxEditor__Wrapper {
+  @apply !border-neutral-800 !bg-neutral-950;
+}
+.dark .NgxEditor {
+  @apply !bg-neutral-950 !text-neutral-100 !border-neutral-800;
+}
+.dark .NgxEditor__MenuBar {
+  @apply !bg-neutral-950 !border-neutral-800 !border-b;
+}
+.dark .NgxEditor__MenuItem {
+  @apply !text-neutral-400;
+}
+.dark .NgxEditor__MenuItem:hover {
+  @apply !bg-neutral-800 !text-white;
+}
+.dark .NgxEditor__MenuItem.NgxEditor__MenuItem--Active {
+  @apply !bg-neutral-800 !text-indigo-400;
+}
+.dark .NgxEditor__Dropdown {
+  @apply !bg-neutral-950 !border-neutral-800;
+}
+.dark .NgxEditor__Dropdown .NgxEditor__Dropdown--Text {
+  @apply !text-neutral-300;
+}
+.dark .NgxEditor__Dropdown .NgxEditor__Dropdown--Item:hover:not(.NgxEditor__Dropdown--Item--Disabled) {
+  @apply !bg-neutral-800 !text-white;
+}
+.dark .NgxEditor__Dropdown .NgxEditor__Dropdown--Item--Active {
+  @apply !bg-neutral-800 !text-indigo-400;
+}
+.dark .NgxEditor__Popup {
+  @apply !bg-neutral-900 !border-neutral-800 !text-neutral-200;
+}
+.dark .NgxEditor__Popup input {
+  @apply !bg-neutral-800 !border-neutral-700 !text-white;
+}
+
+.dark .NgxEditor__MenuItem svg, 
+.dark .NgxEditor__MenuItem path {
+  fill: currentColor !important;
 }
