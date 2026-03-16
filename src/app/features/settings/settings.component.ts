@@ -9,81 +9,102 @@ import { LucideAngularModule } from 'lucide-angular';
   standalone: true,
   imports: [CommonModule, RouterModule, LucideAngularModule],
   template: `
-    <div class="p-8 max-w-4xl mx-auto">
-      <header class="flex items-center justify-between mb-12">
-        <div>
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Settings</h1>
-          <p class="text-neutral-500 dark:text-neutral-400 mt-1">Manage your application preferences</p>
+    <div class="min-h-full px-8 py-10 max-w-4xl mx-auto" style="font-family: var(--font-sans);">
+      <!-- Page Header -->
+      <header class="mb-10">
+        <div class="flex items-center gap-2.5 mb-2">
+          <div class="h-9 w-9 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+            <lucide-icon name="Settings" class="h-5 w-5" style="color: var(--accent);" />
+          </div>
+          <h1 class="text-2xl font-bold" style="color: var(--text-primary);">Settings</h1>
         </div>
+        <p class="text-sm" style="color: var(--text-muted);">Manage your application preferences.</p>
       </header>
 
-      <div class="space-y-8">
+      <div class="space-y-4">
         <!-- Appearance -->
-        <section class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-colors">
-          <h2 class="text-xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-            <lucide-icon name="Palette" class="h-5 w-5 text-indigo-500" />
+        <section class="rounded-2xl p-6 transition-all" style="
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          box-shadow: var(--shadow-sm);
+        ">
+          <h2 class="text-sm font-bold flex items-center gap-2 mb-5" style="color: var(--text-primary);">
+            <div class="h-7 w-7 rounded-lg flex items-center justify-center" style="background: var(--accent-soft);">
+              <lucide-icon name="Palette" class="h-3.5 w-3.5" style="color: var(--accent);" />
+            </div>
             Appearance
           </h2>
-          
+
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Dark Mode</h3>
-              <p class="text-sm text-neutral-500 mt-1">Toggle between light and dark themes</p>
+              <h3 class="text-sm font-semibold" style="color: var(--text-primary);">Dark Mode</h3>
+              <p class="text-xs mt-0.5" style="color: var(--text-muted);">Toggle between light and dark themes</p>
             </div>
-            
             <button 
               (click)="themeService.toggleDarkMode()"
-              class="w-14 h-8 rounded-full transition-colors relative"
-              [class.bg-indigo-500]="themeService.darkMode()"
-              [class.bg-neutral-300]="!themeService.darkMode()"
-              [class.dark:bg-neutral-700]="!themeService.darkMode()"
+              class="w-12 h-6 rounded-full transition-all relative shrink-0"
+              [style.background]="themeService.darkMode() ? 'var(--accent)' : 'var(--border-subtle)'"
             >
               <div 
-                class="absolute top-1 left-1 bg-white h-6 w-6 rounded-full transition-transform shadow flex items-center justify-center"
+                class="absolute top-0.5 left-0.5 bg-white h-5 w-5 rounded-full transition-transform shadow-sm flex items-center justify-center"
                 [class.translate-x-6]="themeService.darkMode()"
               >
-                <lucide-icon [name]="themeService.darkMode() ? 'Moon' : 'Sun'" class="h-3 w-3 text-neutral-800" />
+                <lucide-icon [name]="themeService.darkMode() ? 'Moon' : 'Sun'" class="h-2.5 w-2.5" style="color: #374151;" />
               </div>
             </button>
           </div>
         </section>
 
-        <!-- Account Settings -->
-        <section class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-colors">
-          <h2 class="text-xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-            <lucide-icon name="User" class="h-5 w-5 text-indigo-500" />
+        <!-- Account -->
+        <section class="rounded-2xl p-6 transition-all" style="
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          box-shadow: var(--shadow-sm);
+        ">
+          <h2 class="text-sm font-bold flex items-center gap-2 mb-5" style="color: var(--text-primary);">
+            <div class="h-7 w-7 rounded-lg flex items-center justify-center" style="background: var(--accent-soft);">
+              <lucide-icon name="User" class="h-3.5 w-3.5" style="color: var(--accent);" />
+            </div>
             Account
           </h2>
-          
+
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Profile Settings</h3>
-              <p class="text-sm text-neutral-500 mt-1">Update your personal information</p>
+              <h3 class="text-sm font-semibold" style="color: var(--text-primary);">Profile Settings</h3>
+              <p class="text-xs mt-0.5" style="color: var(--text-muted);">Update your personal information</p>
             </div>
             <button 
               routerLink="/dashboard/profile"
-              class="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 rounded-lg text-sm font-semibold transition-colors dark:text-white text-neutral-900"
-            >
-              Manage Profile
-            </button>
+              class="px-4 py-2 rounded-lg text-xs font-semibold transition-all"
+              style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
+              (mouseenter)="$event.currentTarget.style.borderColor='var(--accent-border)'; $event.currentTarget.style.color='var(--accent)'"
+              (mouseleave)="$event.currentTarget.style.borderColor='var(--border-subtle)'; $event.currentTarget.style.color='var(--text-secondary)'"
+            >Manage Profile</button>
           </div>
         </section>
 
-        <!-- Notifications -->
-        <section class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 opacity-75 hover:border-indigo-500/50 transition-colors">
-          <h2 class="text-xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-2">
-            <lucide-icon name="Bell" class="h-5 w-5 text-indigo-500" />
-            Notifications <span class="text-[10px] uppercase font-bold bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400 px-2 py-0.5 rounded-full ml-2">Coming Soon</span>
+        <!-- Notifications (Coming Soon) -->
+        <section class="rounded-2xl p-6 transition-all" style="
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          box-shadow: var(--shadow-sm);
+          opacity: 0.65;
+        ">
+          <h2 class="text-sm font-bold flex items-center gap-2 mb-5" style="color: var(--text-primary);">
+            <div class="h-7 w-7 rounded-lg flex items-center justify-center" style="background: var(--accent-soft);">
+              <lucide-icon name="Bell" class="h-3.5 w-3.5" style="color: var(--accent);" />
+            </div>
+            Notifications
+            <span class="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full ml-1" style="background: var(--accent-soft); color: var(--accent);">Coming Soon</span>
           </h2>
-          
+
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="font-semibold text-neutral-800 dark:text-neutral-200">Email Notifications</h3>
-              <p class="text-sm text-neutral-500 mt-1">Receive updates via email</p>
+              <h3 class="text-sm font-semibold" style="color: var(--text-primary);">Email Notifications</h3>
+              <p class="text-xs mt-0.5" style="color: var(--text-muted);">Receive updates via email</p>
             </div>
-            
-            <button class="w-14 h-8 rounded-full transition-colors relative bg-neutral-300 dark:bg-neutral-700 cursor-not-allowed">
-              <div class="absolute top-1 left-1 bg-white h-6 w-6 rounded-full shadow translate-x-0"></div>
+            <button class="w-12 h-6 rounded-full relative cursor-not-allowed shrink-0" style="background: var(--border-subtle);">
+              <div class="absolute top-0.5 left-0.5 bg-white h-5 w-5 rounded-full shadow-sm"></div>
             </button>
           </div>
         </section>

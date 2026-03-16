@@ -1,114 +1,154 @@
-<div class="p-8 max-w-6xl mx-auto">
-  <header class="flex items-center justify-between mb-12">
+<div class="min-h-full px-8 py-10 max-w-6xl mx-auto" style="font-family: var(--font-sans);">
+  <!-- Page Header -->
+  <header class="flex items-center justify-between mb-10">
     <div>
-      <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Workspaces</h1>
-      <p class="text-neutral-500 dark:text-neutral-400 mt-1">Select or create a workspace to get started</p>
+      <div class="flex items-center gap-2.5 mb-2">
+        <div class="h-9 w-9 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+          <lucide-icon [name]="'LayoutGrid'" class="h-5 w-5" style="color: var(--accent);" />
+        </div>
+        <h1 class="text-2xl font-bold" style="color: var(--text-primary);">Workspaces</h1>
+      </div>
+      <p class="text-sm" style="color: var(--text-muted);">Organise your notes, notebooks, and projects into workspaces.</p>
     </div>
     <button 
       (click)="openCreateModal()"
-      class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
+      style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+      (mouseenter)="$event.currentTarget.style.opacity='0.9'"
+      (mouseleave)="$event.currentTarget.style.opacity='1'"
     >
-      <lucide-icon [name]="'Plus'" class="h-5 w-5" />
+      <lucide-icon [name]="'Plus'" class="h-4 w-4" />
       <span>New Workspace</span>
     </button>
   </header>
 
-  <!-- New Workspace Modal -->
+  <!-- Create/Edit Workspace Modal -->
   @if (showCreateModal()) {
     <app-modal [title]="isEditMode() ? 'Edit Workspace' : 'Create New Workspace'" (close)="showCreateModal.set(false)">
-      <form [formGroup]="workspaceForm" (ngSubmit)="onCreateWorkspace()" class="space-y-6">
-        <div class="space-y-2">
-          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Workspace Name</label>
+      <form [formGroup]="workspaceForm" (ngSubmit)="onCreateWorkspace()" class="space-y-5">
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wide" style="color: var(--text-muted);">Workspace Name</label>
           <input 
             formControlName="name"
             type="text" 
             placeholder="Marketing, Personal, Engineering..."
-            class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white"
+            class="w-full rounded-xl py-3 px-4 outline-none transition-all text-sm"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-primary); font-family: var(--font-sans);"
           />
         </div>
-
-        <div class="space-y-2">
-          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Description (Optional)</label>
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wide" style="color: var(--text-muted);">
+            Description <span style="font-weight: 400;">(optional)</span>
+          </label>
           <textarea 
             formControlName="description"
             rows="3"
             placeholder="What's this workspace for?"
-            class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white resize-none"
+            class="w-full rounded-xl py-3 px-4 outline-none transition-all text-sm resize-none"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-primary); font-family: var(--font-sans);"
           ></textarea>
         </div>
-
-        <div class="flex items-center gap-3">
-           <button 
+        <div class="flex items-center gap-3 pt-2">
+          <button 
             type="button"
             (click)="showCreateModal.set(false)"
-            class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all"
-           >
-             Cancel
-           </button>
-           <button 
+            class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
+            style="background: var(--bg-base); color: var(--text-secondary); border: 1px solid var(--border-subtle);"
+          >Cancel</button>
+          <button 
             [disabled]="workspaceForm.invalid || isSubmitting()"
             type="submit"
-            class="flex-[2] bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20"
-           >
-             @if (isSubmitting()) {
-               <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" />
-               <span>Creating...</span>
-             } @else {
-               <span>Create Workspace</span>
-             }
-           </button>
+            class="flex-[2] py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-95"
+            style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+          >
+            @if (isSubmitting()) {
+              <lucide-icon [name]="'Loader2'" class="h-4 w-4 animate-spin" />
+              <span>Creating...</span>
+            } @else {
+              <span>{{ isEditMode() ? 'Save Changes' : 'Create Workspace' }}</span>
+            }
+          </button>
         </div>
       </form>
     </app-modal>
   }
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <!-- Workspace Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
     @for (workspace of workspaceService.workspaces(); track workspace.id) {
       <div 
-        class="group relative bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 hover:shadow-2xl hover:border-indigo-500/50 transition-all cursor-pointer"
+        class="group relative rounded-2xl p-6 cursor-pointer transition-all"
+        style="
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          box-shadow: var(--shadow-sm);
+        "
+        (mouseenter)="$event.currentTarget.style.boxShadow='var(--shadow-md)'; $event.currentTarget.style.borderColor='var(--accent-border)'"
+        (mouseleave)="$event.currentTarget.style.boxShadow='var(--shadow-sm)'; $event.currentTarget.style.borderColor='var(--border-subtle)'"
       >
-        <!-- Actions -->
-        <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-           <button 
+        <!-- Hover Actions -->
+        <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <button 
             (click)="$event.stopPropagation(); openEditModal(workspace)"
-            class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-300 shadow-sm"
+            class="p-2 rounded-lg transition-all"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
+            (mouseenter)="$event.currentTarget.style.color='var(--accent)'"
+            (mouseleave)="$event.currentTarget.style.color='var(--text-secondary)'"
           >
-            <lucide-icon [name]="'Edit3'" class="h-4 w-4" />
+            <lucide-icon [name]="'Pencil'" class="h-3.5 w-3.5" />
           </button>
           <button 
             (click)="$event.stopPropagation(); onDeleteWorkspace(workspace)"
-            class="p-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 text-red-500 shadow-sm"
+            class="p-2 rounded-lg transition-all"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
+            (mouseenter)="$event.currentTarget.style.color='#ef4444'; $event.currentTarget.style.background='rgba(239,68,68,0.07)'"
+            (mouseleave)="$event.currentTarget.style.color='var(--text-secondary)'; $event.currentTarget.style.background='var(--bg-base)'"
           >
-            <lucide-icon [name]="'Trash2'" class="h-4 w-4" />
+            <lucide-icon [name]="'Trash2'" class="h-3.5 w-3.5" />
           </button>
         </div>
 
         <div [routerLink]="['/dashboard/workspaces', workspace.id]">
-          <div class="h-12 w-12 rounded-xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+          <!-- Icon / Emoji -->
+          <div class="h-11 w-11 rounded-xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:scale-105 duration-200"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle);"
+          >
             {{ workspace.emoji || '📂' }}
           </div>
-          <h3 class="text-lg font-bold text-neutral-900 dark:text-white group-hover:text-indigo-500 transition-colors">{{ workspace.name }}</h3>
-          <p class="text-neutral-500 text-sm mt-1 line-clamp-2">{{ workspace.description || 'No description provided.' }}</p>
-          
-          <div class="mt-6 flex items-center gap-4 text-xs text-neutral-400">
-            <span class="flex items-center gap-1">
-              <lucide-icon [name]="'LayoutGrid'" class="h-3 w-3" />
-              {{ (workspace.notebooks || []).length }} Notebooks
-            </span>
+          <!-- Name -->
+          <h3 class="text-base font-bold mb-1 transition-colors group-hover:text-[var(--accent)]" style="color: var(--text-primary);">
+            {{ workspace.name }}
+          </h3>
+          <!-- Description -->
+          <p class="text-sm line-clamp-2 mb-5" style="color: var(--text-muted);">
+            {{ workspace.description || 'No description provided.' }}
+          </p>
+          <!-- Meta -->
+          <div class="flex items-center gap-1.5 text-[11px] font-medium" style="color: var(--text-muted);">
+            <lucide-icon [name]="'LayoutGrid'" class="h-3 w-3" />
+            <span>{{ (workspace.notebooks || []).length }} {{ (workspace.notebooks || []).length === 1 ? 'Notebook' : 'Notebooks' }}</span>
           </div>
         </div>
       </div>
     }
 
-    <!-- Add Placeholder if empty -->
+    <!-- Empty State -->
     @if (workspaceService.workspaces().length === 0) {
-       <div class="col-span-full py-20 text-center border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-3xl">
-         <div class="h-16 w-16 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <lucide-icon [name]="'Plus'" class="h-8 w-8 text-neutral-400" />
-         </div>
-         <h3 class="text-xl font-bold">No workspaces found</h3>
-         <p class="text-neutral-500 mt-2">Create your first workspace to start organizing your notes</p>
-       </div>
+      <div class="col-span-full py-20 text-center rounded-2xl" style="border: 2px dashed var(--border-subtle);">
+        <div class="h-16 w-16 rounded-3xl mx-auto mb-5 flex items-center justify-center" style="background: var(--accent-soft);">
+          <lucide-icon [name]="'FolderPlus'" class="h-8 w-8" style="color: var(--accent);" />
+        </div>
+        <h3 class="text-lg font-bold mb-2" style="color: var(--text-primary);">No workspaces yet</h3>
+        <p class="text-sm mb-6" style="color: var(--text-muted);">Create your first workspace to start organising your notes.</p>
+        <button 
+          (click)="openCreateModal()"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
+          style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+        >
+          <lucide-icon [name]="'Plus'" class="h-4 w-4" />
+          <span>Create Workspace</span>
+        </button>
+      </div>
     }
   </div>
 </div>

@@ -8,71 +8,76 @@ import { LucideAngularModule } from 'lucide-angular';
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="p-8 max-w-4xl mx-auto">
-      <header class="flex items-center justify-between mb-12">
-        <div>
-          <h1 class="text-3xl font-bold text-neutral-900 dark:text-white">Profile</h1>
-          <p class="text-neutral-500 dark:text-neutral-400 mt-1">Manage your account information</p>
+    <div class="min-h-full px-8 py-10 max-w-4xl mx-auto" style="font-family: var(--font-sans);">
+      <!-- Page Header -->
+      <header class="mb-10">
+        <div class="flex items-center gap-2.5 mb-2">
+          <div class="h-9 w-9 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+            <lucide-icon name="User" class="h-5 w-5" style="color: var(--accent);" />
+          </div>
+          <h1 class="text-2xl font-bold" style="color: var(--text-primary);">Profile</h1>
         </div>
+        <p class="text-sm" style="color: var(--text-muted);">Manage your account information and preferences.</p>
       </header>
 
-      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-sm">
-        <!-- Cover Photo area (decorative) -->
-        <div class="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-full"></div>
-        
-        <div class="px-8 pb-8">
-          <!-- User Avatar -->
-          <div class="relative -mt-12 mb-6">
-            <div class="h-24 w-24 rounded-2xl bg-white dark:bg-neutral-800 p-2 shadow-lg border border-neutral-200 dark:border-neutral-700">
-              <div class="w-full h-full rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white text-3xl font-bold">
-                {{ userInitials() }}
-              </div>
-            </div>
+      <!-- Profile Card -->
+      <div class="rounded-2xl overflow-hidden mb-5" style="
+        background: var(--bg-surface);
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-sm);
+      ">
+        <!-- Avatar + Name Header -->
+        <div class="px-8 py-6 flex items-center gap-5" style="border-bottom: 1px solid var(--border-subtle);">
+          <div class="h-16 w-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0"
+            style="background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%); box-shadow: 0 4px 16px var(--accent-glow);"
+          >
+            {{ userInitials() }}
           </div>
+          <div>
+            <h2 class="text-lg font-bold" style="color: var(--text-primary);">{{ user()?.name || 'User' }}</h2>
+            <p class="text-sm" style="color: var(--text-muted);">{{ user()?.email }}</p>
+          </div>
+        </div>
 
-          <!-- User Details Info -->
-          <div class="space-y-8">
+        <!-- Info Fields -->
+        <div class="px-8 py-6">
+          <p class="text-xs font-semibold uppercase tracking-wider mb-5" style="color: var(--text-muted);">Personal Information</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h2 class="text-2xl font-bold text-neutral-900 dark:text-white">Personal Information</h2>
-              <p class="text-sm text-neutral-500 mt-1">Your basic profile information</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="space-y-2">
-                <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Name</label>
-                <div class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent rounded-xl py-3 px-4 flex items-center gap-3">
-                  <lucide-icon name="User" class="h-4 w-4 text-neutral-400" />
-                  <span class="text-neutral-900 dark:text-white font-medium">{{ user()?.name || 'User' }}</span>
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Email Address</label>
-                <div class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent rounded-xl py-3 px-4 flex items-center gap-3">
-                  <lucide-icon name="Mail" class="h-4 w-4 text-neutral-400" />
-                  <span class="text-neutral-900 dark:text-white font-medium">{{ user()?.email }}</span>
-                </div>
+              <label class="text-xs font-medium block mb-1.5" style="color: var(--text-muted);">Full Name</label>
+              <div class="flex items-center gap-3 rounded-xl py-3 px-4" style="background: var(--bg-base); border: 1px solid var(--border-subtle);">
+                <lucide-icon name="User" class="h-4 w-4 shrink-0" style="color: var(--text-muted);" />
+                <span class="text-sm font-medium" style="color: var(--text-primary);">{{ user()?.name || 'User' }}</span>
               </div>
             </div>
-
-            <!-- Danger Zone -->
-            <div class="pt-8 border-t border-neutral-200 dark:border-neutral-800">
-              <h3 class="text-red-500 font-bold mb-4 flex items-center gap-2">
-                <lucide-icon name="AlertTriangle" class="h-5 w-5" />
-                Danger Zone
-              </h3>
-              <div class="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-xl p-4 flex items-center justify-between">
-                <div>
-                  <h4 class="font-semibold text-red-900 dark:text-red-400">Delete Account</h4>
-                  <p class="text-sm text-red-700 dark:text-red-500/80 mt-1">Permanently remove your account and all data</p>
-                </div>
-                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-bold transition-colors shadow-lg shadow-red-500/20 opacity-50 cursor-not-allowed">
-                  Delete Account
-                </button>
+            <div>
+              <label class="text-xs font-medium block mb-1.5" style="color: var(--text-muted);">Email Address</label>
+              <div class="flex items-center gap-3 rounded-xl py-3 px-4" style="background: var(--bg-base); border: 1px solid var(--border-subtle);">
+                <lucide-icon name="Mail" class="h-4 w-4 shrink-0" style="color: var(--text-muted);" />
+                <span class="text-sm font-medium" style="color: var(--text-primary);">{{ user()?.email }}</span>
               </div>
             </div>
-            
           </div>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="rounded-2xl p-6" style="
+        background: rgba(239,68,68,0.04);
+        border: 1px solid rgba(239,68,68,0.15);
+      ">
+        <h3 class="text-sm font-bold flex items-center gap-2 mb-4" style="color: #ef4444;">
+          <lucide-icon name="AlertTriangle" class="h-4 w-4" />
+          Danger Zone
+        </h3>
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="text-sm font-semibold" style="color: #ef4444;">Delete Account</h4>
+            <p class="text-xs mt-0.5" style="color: rgba(239,68,68,0.7);">Permanently remove your account and all data</p>
+          </div>
+          <button class="px-4 py-2 rounded-lg text-sm font-bold text-white transition-colors opacity-50 cursor-not-allowed"
+            style="background: #ef4444;"
+          >Delete Account</button>
         </div>
       </div>
     </div>
