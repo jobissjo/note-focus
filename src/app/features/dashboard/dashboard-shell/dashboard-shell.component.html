@@ -1,9 +1,10 @@
-<div class="flex h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 overflow-hidden font-sans">
+<div class="flex h-screen overflow-hidden" style="background: var(--bg-base); font-family: var(--font-sans);">
   <!-- Mobile Overlay -->
   @if (isMobileMenuOpen()) {
     <div 
       (click)="isMobileMenuOpen.set(false)"
-      class="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+      class="fixed inset-0 z-40 lg:hidden transition-opacity"
+      style="background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);"
     ></div>
   }
 
@@ -19,14 +20,21 @@
   <!-- Main Content -->
   <div class="flex-1 flex flex-col min-w-0 relative">
     <!-- Mobile Header -->
-    <header class="lg:hidden h-14 border-b border-neutral-200 dark:border-neutral-800 flex items-center px-4 shrink-0 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-xl">
+    <header class="lg:hidden h-14 flex items-center px-4 shrink-0" style="
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      backdrop-filter: blur(12px);
+    ">
       <button 
         (click)="isMobileMenuOpen.set(true)"
-        class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors"
+        class="p-2 rounded-lg transition-all"
+        style="color: var(--text-muted);"
+        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'"
+        (mouseleave)="$event.currentTarget.style.background='transparent'"
       >
         <lucide-icon [name]="'Menu'" class="h-5 w-5" />
       </button>
-      <div class="ml-4 font-bold tracking-tight">NoteFocus</div>
+      <div class="ml-4 font-bold text-sm" style="color: var(--text-primary);">NoteFocus</div>
     </header>
 
     <main class="flex-1 relative overflow-y-auto custom-scrollbar">
@@ -34,38 +42,71 @@
     </main>
   </div>
 
-  <!-- Global Modals triggered from Sidebar -->
+  <!-- Global Modals: New Workspace -->
   @if (sidebarActions.showWorkspaceModal()) {
     <app-modal title="New Workspace" (close)="sidebarActions.showWorkspaceModal.set(false)">
-      <form [formGroup]="workspaceForm" (ngSubmit)="onCreateWorkspace()" class="space-y-6">
-        <div class="space-y-2">
-          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Name</label>
-          <input formControlName="name" type="text" placeholder="Marketing, Projects..." class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white" />
+      <form [formGroup]="workspaceForm" (ngSubmit)="onCreateWorkspace()" class="space-y-5">
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wide" style="color: var(--text-muted);">Workspace Name</label>
+          <input 
+            formControlName="name" 
+            type="text" 
+            placeholder="Marketing, Projects..."
+            class="w-full rounded-xl py-3 px-4 outline-none transition-all text-sm"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-primary); font-family: var(--font-sans);"
+          />
         </div>
-        <div class="flex items-center gap-3 mt-8">
-           <button type="button" (click)="sidebarActions.showWorkspaceModal.set(false)" class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all">Cancel</button>
-           <button [disabled]="workspaceForm.invalid || isSubmitting()" type="submit" class="flex-[2] bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
-             @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" /> }
-             <span>Create</span>
-           </button>
+        <div class="flex items-center gap-3 pt-2">
+          <button 
+            type="button" 
+            (click)="sidebarActions.showWorkspaceModal.set(false)"
+            class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
+            style="background: var(--bg-base); color: var(--text-secondary); border: 1px solid var(--border-subtle);"
+          >Cancel</button>
+          <button 
+            [disabled]="workspaceForm.invalid || isSubmitting()"
+            type="submit"
+            class="flex-[2] py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-95"
+            style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+          >
+            @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-4 w-4 animate-spin" /> }
+            <span>Create Workspace</span>
+          </button>
         </div>
       </form>
     </app-modal>
   }
 
+  <!-- Global Modals: New Notebook -->
   @if (sidebarActions.showNotebookModal()) {
     <app-modal [title]="'New Notebook in ' + sidebarActions.selectedWorkspace()?.name" (close)="sidebarActions.showNotebookModal.set(false)">
-      <form [formGroup]="notebookForm" (ngSubmit)="onCreateNotebook()" class="space-y-6">
-        <div class="space-y-2">
-          <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">Notebook Name</label>
-          <input formControlName="name" type="text" placeholder="Q1 Goals, Ideas..." class="w-full bg-neutral-100 dark:bg-neutral-800/50 border border-transparent focus:border-indigo-500 rounded-xl py-3 px-4 outline-none transition-all dark:text-white" />
+      <form [formGroup]="notebookForm" (ngSubmit)="onCreateNotebook()" class="space-y-5">
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wide" style="color: var(--text-muted);">Notebook Name</label>
+          <input 
+            formControlName="name" 
+            type="text" 
+            placeholder="Q1 Goals, Ideas..."
+            class="w-full rounded-xl py-3 px-4 outline-none transition-all text-sm"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-primary); font-family: var(--font-sans);"
+          />
         </div>
-        <div class="flex items-center gap-3 mt-8">
-           <button type="button" (click)="sidebarActions.showNotebookModal.set(false)" class="flex-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 font-bold py-3.5 rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all">Cancel</button>
-           <button [disabled]="notebookForm.invalid || isSubmitting()" type="submit" class="flex-[2] bg-indigo-600 text-white font-bold py-3.5 rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20">
-             @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-5 w-5 animate-spin" /> }
-             <span>Create Notebook</span>
-           </button>
+        <div class="flex items-center gap-3 pt-2">
+          <button 
+            type="button" 
+            (click)="sidebarActions.showNotebookModal.set(false)"
+            class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
+            style="background: var(--bg-base); color: var(--text-secondary); border: 1px solid var(--border-subtle);"
+          >Cancel</button>
+          <button 
+            [disabled]="notebookForm.invalid || isSubmitting()"
+            type="submit"
+            class="flex-[2] py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-95"
+            style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+          >
+            @if (isSubmitting()) { <lucide-icon [name]="'Loader2'" class="h-4 w-4 animate-spin" /> }
+            <span>Create Notebook</span>
+          </button>
         </div>
       </form>
     </app-modal>

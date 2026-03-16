@@ -1,13 +1,30 @@
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+@reference "tailwindcss";
+
+:host {
+  display: flex;
+  height: 100%;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+
+/* Active nav item — indigo accent (workspaces/notes) */
+:host ::ng-deep .active-nav-item {
+  color: var(--accent) !important;
+  font-weight: 600;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.1);
-  border-radius: 10px;
+
+/* Active nav item — purple accent (journals/diaries) */
+:host ::ng-deep .active-nav-item-purple {
+  color: var(--accent) !important;
+  font-weight: 600;
 }
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
+
+/* Active bottom action */
+:host ::ng-deep .active-bottom-action {
+  background: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600;
+}
+
+aside {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156,163,175,0.3) transparent;
 }

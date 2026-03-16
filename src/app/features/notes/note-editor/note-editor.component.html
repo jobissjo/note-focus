@@ -1,47 +1,72 @@
-<div class="h-full flex flex-col bg-white dark:bg-neutral-950">
+<div class="h-full flex flex-col" style="background: var(--bg-surface); font-family: var(--font-sans);">
+  
   <!-- Top Bar -->
-  <header class="h-14 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between px-6 shrink-0 bg-white dark:bg-neutral-950">
-    <div class="flex items-center gap-4 flex-1 min-w-0">
+  <header class="shrink-0 flex items-center justify-between px-6 h-14" style="
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+    backdrop-filter: blur(12px);
+  ">
+    <div class="flex items-center gap-3 flex-1 min-w-0">
       <!-- Breadcrumbs -->
-      <nav class="flex items-center gap-2 text-xs text-neutral-500 mr-4 shrink-0">
+      <nav class="flex items-center gap-1.5 text-xs shrink-0" style="color: var(--text-muted);">
         @for (crumb of breadcrumbService.breadcrumbs(); track crumb.label; let last = $last) {
           @if (crumb.url) {
-            <a [routerLink]="crumb.url" class="hover:text-indigo-500 transition-colors">{{ crumb.label }}</a>
+            <a [routerLink]="crumb.url" class="transition-colors hover:text-[var(--accent)]" style="color: var(--text-muted);">{{ crumb.label }}</a>
           } @else {
-            <span class="font-medium text-neutral-400">{{ crumb.label }}</span>
+            <span class="font-medium" style="color: var(--text-secondary);">{{ crumb.label }}</span>
           }
           @if (!last) {
-            <span class="text-neutral-300">/</span>
+            <span style="color: var(--border-subtle);">/</span>
           }
         }
       </nav>
 
-      <div class="h-4 w-px bg-neutral-200 dark:bg-neutral-800 mr-4 shrink-0"></div>
+      <div class="h-4 w-px shrink-0" style="background: var(--border-subtle);"></div>
 
       <div class="text-xl shrink-0">{{ noteService.activeNote()?.emoji || '📄' }}</div>
       <input 
         [ngModel]="noteService.activeNote()?.title"
         (ngModelChange)="updateTitle($event)"
-        class="bg-transparent border-none outline-none font-bold text-lg w-full focus:ring-0 placeholder:text-neutral-400 truncate"
+        class="bg-transparent border-none outline-none font-bold text-base w-full focus:ring-0 truncate"
         placeholder="Untitled Note"
+        style="color: var(--text-primary); font-family: var(--font-sans);"
       />
     </div>
 
-    <div class="flex items-center gap-2">
-      <div class="flex items-center gap-1.5 px-3 py-1.5 text-xs text-neutral-500 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
-         <lucide-icon [name]="isSaving() ? 'Loader2' : 'Clock'" [class.animate-spin]="isSaving()" class="h-3.5 w-3.5" />
-         <span>{{ isSaving() ? 'Saving...' : 'Saved' }}</span>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <!-- Save status -->
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--bg-base); color: var(--text-muted);">
+        <lucide-icon 
+          [name]="isSaving() ? 'Loader2' : 'CheckCircle2'" 
+          [class.animate-spin]="isSaving()" 
+          class="h-3.5 w-3.5"
+          [style.color]="isSaving() ? 'var(--text-muted)' : '#22c55e'"
+        />
+        <span>{{ isSaving() ? 'Saving...' : 'Saved' }}</span>
       </div>
-      <div class="w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-1"></div>
-      <button class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors">
+
+      <div class="w-px h-4" style="background: var(--border-subtle);"></div>
+
+      <button class="p-2 rounded-lg transition-all"
+        style="color: var(--text-muted);"
+        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
+        (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+      >
         <lucide-icon [name]="'Share2'" class="h-4 w-4" />
       </button>
-      <button class="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-500 transition-colors">
+      <button class="p-2 rounded-lg transition-all"
+        style="color: var(--text-muted);"
+        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
+        (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+      >
         <lucide-icon [name]="'Maximize2'" class="h-4 w-4" />
       </button>
       <button 
         (click)="onDeleteNote()"
-        class="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-500 transition-colors"
+        class="p-2 rounded-lg transition-all"
+        style="color: var(--text-muted);"
+        (mouseenter)="$event.currentTarget.style.background='rgba(239,68,68,0.07)'; $event.currentTarget.style.color='#ef4444'"
+        (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
       >
         <lucide-icon [name]="'Trash2'" class="h-4 w-4" />
       </button>
@@ -49,23 +74,21 @@
   </header>
 
   <!-- Editor Area -->
-  <div class="flex-1 overflow-y-auto px-4 py-12 bg-neutral-50 dark:bg-neutral-950">
-    <div class="max-w-4xl mx-auto">
-      <div class="editor-container transition-all duration-300">
-        @if (isBrowser) {
-          <div class="sticky top-0 z-30 bg-neutral-50/80 dark:bg-neutral-950/80 backdrop-blur-xl pt-2 pb-6">
-            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
-          </div>
-          <div class="prose dark:prose-invert max-w-none">
-            <ngx-editor
-              [editor]="editor"
-              [ngModel]="content()"
-              (ngModelChange)="onContentChange($event)"
-              [placeholder]="'Write your story here...'"
-            ></ngx-editor>
-          </div>
-        }
-      </div>
+  <div class="flex-1 overflow-y-auto custom-scrollbar px-6 py-10" style="background: var(--bg-base);">
+    <div class="max-w-3xl mx-auto">
+      @if (isBrowser) {
+        <div class="sticky top-0 z-30 pb-6 pt-1" style="background: var(--bg-base);">
+          <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
+        </div>
+        <div class="prose dark:prose-invert max-w-none">
+          <ngx-editor
+            [editor]="editor"
+            [ngModel]="content()"
+            (ngModelChange)="onContentChange($event)"
+            [placeholder]="'Write your story here...'"
+          ></ngx-editor>
+        </div>
+      }
     </div>
   </div>
 </div>

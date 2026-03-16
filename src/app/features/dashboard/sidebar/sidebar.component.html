@@ -1,117 +1,156 @@
 <aside 
-  class="w-64 h-full border-r border-neutral-200 dark:border-neutral-800 bg-white/50 dark:bg-neutral-900/50 backdrop-blur-xl flex flex-col transition-all duration-300 overflow-hidden"
-  [class.w-16]="isCollapsed()"
+  class="h-full border-r flex flex-col transition-all duration-300 overflow-hidden"
+  style="
+    width: var(--sidebar-width);
+    background: var(--bg-surface);
+    border-color: var(--border-subtle);
+    font-family: var(--font-sans);
+  "
+  [style.width]="isCollapsed() ? '64px' : 'var(--sidebar-width)'"
 >
-  <!-- Header / User Profile -->
+  <!-- Header / Branding -->
   <div 
     (click)="navigateToDashboard()"
-    class="p-4 flex items-center gap-4 border-b border-neutral-200 dark:border-neutral-800 cursor-pointer group transition-colors"
+    class="flex items-center gap-3 px-3 py-3.5 cursor-pointer group transition-all shrink-0"
+    style="border-bottom: 1px solid var(--border-subtle);"
   >
-    <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-xl shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
-      <lucide-icon [name]="'Notebook'" class="h-5 w-5" />
+    <div class="h-8 w-8 shrink-0 rounded-xl flex items-center justify-center text-white shadow-lg transition-transform duration-200 group-hover:scale-105"
+      style="background: linear-gradient(135deg, #7C5CFF 0%, #a78bfa 100%); box-shadow: 0 4px 14px rgba(124,92,255,0.35);"
+    >
+      <lucide-icon [name]="'Notebook'" class="h-4 w-4" />
     </div>
     @if (!isCollapsed()) {
       <div class="flex-1 min-w-0">
-        <h1 class="text-base font-black tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-400">NoteFocus</h1>
-        <p class="text-[10px] font-medium text-neutral-400 mt-1.5 truncate">{{ authService.currentUser()?.email }}</p>
+        <h1 class="text-sm font-bold tracking-tight leading-none" style="color: var(--text-primary);">NoteFocus</h1>
+        <p class="text-[10px] font-medium mt-1 truncate" style="color: var(--text-muted);">{{ authService.currentUser()?.email }}</p>
       </div>
     }
   </div>
 
-  <!-- Search Area -->
+  <!-- Search -->
   @if (!isCollapsed()) {
-    <div class="px-3 py-4">
+    <div class="px-3 pt-3 pb-1 shrink-0">
       <div class="relative group">
-        <lucide-icon [name]="'Search'" class="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400 group-focus-within:text-indigo-500 transition-colors" />
+        <lucide-icon [name]="'Search'" class="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 transition-colors" style="color: var(--text-muted);" />
         <input 
           type="text" 
-          placeholder="Quick search..." 
-          class="w-full bg-neutral-100 dark:bg-neutral-800 border-none rounded-md py-1.5 pl-9 pr-8 text-xs focus:ring-1 focus:ring-indigo-500 outline-none placeholder:text-neutral-500"
+          placeholder="Search..." 
+          class="w-full rounded-lg py-2 pl-8 pr-10 text-xs outline-none transition-all focus:ring-1"
+          style="
+            background: var(--bg-base);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+          "
         />
-        <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 px-1 rounded bg-neutral-200 dark:bg-neutral-700 text-[10px] text-neutral-500">
-          <lucide-icon [name]="'Command'" class="h-2 w-2" />
-          <span>K</span>
+        <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-medium"
+          style="background: var(--bg-base); color: var(--text-muted); border: 1px solid var(--border-subtle);"
+        >
+          <lucide-icon [name]="'Command'" class="h-2 w-2" /><span>K</span>
         </div>
       </div>
     </div>
   }
 
-  <!-- Hierarchy Tree -->
+  <!-- Navigation Tree -->
   <nav class="flex-1 overflow-y-auto px-2 py-2 custom-scrollbar">
-    <!-- Workspaces Section -->
+
+    <!-- Workspaces Section Label -->
     @if (!isCollapsed()) {
-      <div class="px-3 py-2 mt-2 text-[10px] font-bold tracking-wider text-neutral-400 uppercase flex items-center justify-between group">
-        <span routerLink="/dashboard" class="cursor-pointer hover:text-indigo-500 transition-colors">Workspaces</span>
+      <div class="px-2 pt-4 pb-1.5 flex items-center justify-between">
+        <span 
+          routerLink="/dashboard"
+          class="text-[10px] font-semibold tracking-widest uppercase cursor-pointer transition-colors hover:opacity-100 opacity-50"
+          style="color: var(--text-primary); letter-spacing: 0.1em;"
+        >Workspaces</span>
       </div>
     }
 
+    <!-- Workspace Items -->
     @for (workspace of workspaceService.workspaces(); track workspace.id) {
-      <div class="mb-4">
+      <div class="mb-1">
+        <!-- Workspace Row -->
         <div 
-          class="flex items-center gap-1.5 px-2 py-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 cursor-pointer group transition-all"
+          class="flex items-center gap-1 px-1.5 py-1.5 rounded-lg cursor-pointer group transition-all"
+          style="font-family: var(--font-sans);"
+          (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'" 
+          (mouseleave)="$event.currentTarget.style.background='transparent'"
         >
-          <div 
-            (click)="toggleWorkspace(workspace.id)" 
-            class="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 rounded-lg transition-colors"
+          <button 
+            (click)="toggleWorkspace(workspace.id)"
+            class="p-1 rounded-md shrink-0 transition-all"
             [class.rotate-90]="expandedWorkspaces().has(workspace.id)"
+            style="color: var(--text-muted);"
           >
-            <lucide-icon [name]="'ChevronRight'" class="h-4 w-4 text-neutral-400 transition-transform duration-200" />
-          </div>
+            <lucide-icon [name]="'ChevronRight'" class="h-3.5 w-3.5 transition-transform duration-200" />
+          </button>
           <span 
             [routerLink]="['/dashboard/workspaces', workspace.id]"
-            routerLinkActive="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-black shadow-sm"
-            class="text-[13px] font-bold text-neutral-700 dark:text-neutral-300 hover:text-indigo-500 transition-colors flex-1 px-1 py-0.5 rounded-lg whitespace-nowrap overflow-hidden text-ellipsis"
-          >
-            {{ workspace.name }}
-          </span>
+            routerLinkActive="active-nav-item"
+            class="text-[13px] font-semibold flex-1 px-1 py-0.5 rounded-md truncate transition-colors"
+            style="color: var(--text-secondary);"
+          >{{ workspace.name }}</span>
           <button 
             (click)="$event.stopPropagation(); sidebarActions.openNotebookModal(workspace)"
-            class="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-all text-neutral-400 hover:text-indigo-500"
+            class="opacity-0 group-hover:opacity-100 p-1.5 rounded-md transition-all"
+            style="color: var(--text-muted);"
+            (mouseenter)="$event.currentTarget.style.color='var(--accent)'"
+            (mouseleave)="$event.currentTarget.style.color='var(--text-muted)'"
           >
-            <lucide-icon [name]="'Plus'" class="h-3.5 w-3.5" />
+            <lucide-icon [name]="'Plus'" class="h-3 w-3" />
           </button>
         </div>
 
+        <!-- Notebooks -->
         @if (expandedWorkspaces().has(workspace.id)) {
-          <div class="ml-2 mt-1 space-y-0.5 border-l border-neutral-200 dark:border-neutral-800 ml-3.5 pl-2">
+          <div class="ml-4 mt-0.5 space-y-0.5 pl-2.5" style="border-left: 1px solid var(--border-subtle);">
             @for (notebook of workspace.notebooks || []; track notebook.id) {
               <div>
                 <div 
-                  class="flex items-center gap-1.5 px-2 py-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 cursor-pointer group transition-all"
+                  class="flex items-center gap-1 px-1.5 py-1.5 rounded-lg cursor-pointer group transition-all"
+                  (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'"
+                  (mouseleave)="$event.currentTarget.style.background='transparent'"
                 >
-                  <div 
-                    (click)="toggleNotebook(workspace.id, notebook.id)" 
-                    class="p-1 hover:bg-neutral-200 dark:hover:bg-neutral-700/50 rounded-lg transition-colors"
+                  <button 
+                    (click)="toggleNotebook(workspace.id, notebook.id)"
+                    class="p-0.5 rounded shrink-0 transition-all"
                     [class.rotate-90]="expandedNotebooks().has(notebook.id)"
+                    style="color: var(--text-muted);"
                   >
-                    <lucide-icon [name]="'ChevronRight'" class="h-3.5 w-3.5 text-neutral-400 transition-transform duration-200" />
-                  </div>
+                    <lucide-icon [name]="'ChevronRight'" class="h-3 w-3 transition-transform duration-200" />
+                  </button>
                   <div 
                     [routerLink]="['/dashboard/notebooks', notebook.id]"
-                    routerLinkActive="bg-indigo-50/50 dark:bg-indigo-900/10 text-indigo-600 dark:text-indigo-400 font-black"
-                    class="flex items-center gap-2 flex-1 px-1 py-0.5 rounded-lg"
+                    routerLinkActive="active-nav-item"
+                    class="flex items-center gap-1.5 flex-1 px-1 py-0.5 rounded-md"
                   >
-                    <lucide-icon [name]="'Notebook'" class="h-4 w-4 text-indigo-500" />
-                    <span class="text-xs font-semibold text-neutral-600 dark:text-neutral-400">{{ notebook.name }}</span>
+                    <lucide-icon [name]="'Notebook'" class="h-3.5 w-3.5 shrink-0" style="color: var(--accent);" />
+                    <span class="text-xs font-medium truncate" style="color: var(--text-secondary);">{{ notebook.name }}</span>
                   </div>
                   <button 
                     (click)="$event.stopPropagation(); createNote(workspace.id, notebook.id)"
-                    class="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-lg transition-all text-neutral-400 hover:text-indigo-500"
+                    class="opacity-0 group-hover:opacity-100 p-1 rounded transition-all"
+                    style="color: var(--text-muted);"
+                    (mouseenter)="$event.currentTarget.style.color='var(--accent)'"
+                    (mouseleave)="$event.currentTarget.style.color='var(--text-muted)'"
                   >
                     <lucide-icon [name]="'Plus'" class="h-3 w-3" />
                   </button>
                 </div>
 
+                <!-- Notes -->
                 @if (expandedNotebooks().has(notebook.id)) {
-                  <div class="ml-4 mt-1 space-y-0.5">
+                  <div class="ml-4 mt-0.5 space-y-0.5 pl-2" style="border-left: 1px solid var(--border-subtle);">
                     @for (note of notebook.notes || []; track note.id) {
                       <a 
                         [routerLink]="['/dashboard/notes', note.id]"
-                        routerLinkActive="bg-indigo-50/80 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-bold"
-                        class="flex items-center gap-2 px-3 py-1.5 ml-6 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/50 cursor-pointer group transition-all"
+                        routerLinkActive="active-nav-item"
+                        class="flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer group transition-all"
+                        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'"
+                        (mouseleave)="$event.currentTarget.style.background='transparent'"
                       >
-                        <lucide-icon [name]="'StickyNote'" class="h-3.5 w-3.5 text-neutral-400 group-hover:text-indigo-500" />
-                        <span class="text-xs truncate text-neutral-500 dark:text-neutral-500 group-hover:text-neutral-900 dark:group-hover:text-neutral-200">{{ note.title || 'Untitled Note' }}</span>
+                        <lucide-icon [name]="'FileText'" class="h-3 w-3 shrink-0 transition-colors" style="color: var(--text-muted);" />
+                        <span class="text-[11px] truncate transition-colors" style="color: var(--text-muted);">{{ note.title || 'Untitled Note' }}</span>
                       </a>
                     }
                   </div>
@@ -123,77 +162,111 @@
       </div>
     }
 
-    <!-- Journals Section -->
+    <!-- Journals Section Label -->
     @if (!isCollapsed()) {
-      <div class="px-3 py-2 mt-4 text-[10px] font-bold tracking-wider text-neutral-400 uppercase flex items-center justify-between group">
-        <span routerLink="/dashboard/diaries" class="cursor-pointer hover:text-indigo-500 transition-colors">Journals</span>
+      <div class="px-2 pt-5 pb-1.5 flex items-center justify-between">
+        <span 
+          routerLink="/dashboard/diaries"
+          class="text-[10px] font-semibold tracking-widest uppercase cursor-pointer transition-colors hover:opacity-100 opacity-50"
+          style="color: var(--text-primary); letter-spacing: 0.1em;"
+        >Journals</span>
         <button 
           routerLink="/dashboard/diaries"
-          class="opacity-0 group-hover:opacity-100 transition-opacity hover:text-indigo-500"
+          class="p-1 rounded-md transition-all opacity-0 hover:opacity-100"
+          style="color: var(--text-muted);"
+          (mouseenter)="$event.currentTarget.style.color='var(--accent)'"
+          (mouseleave)="$event.currentTarget.style.color='var(--text-muted)'"
         >
-          <lucide-icon [name]="'Plus'" class="h-3.5 w-3.5" />
+          <lucide-icon [name]="'Plus'" class="h-3 w-3" />
         </button>
       </div>
     }
 
+    <!-- Diary Items -->
     @for (diary of diaryService.diaries(); track diary.id) {
-      <div class="mb-1">
-        <div class="flex items-center gap-1.5 px-2 py-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 cursor-pointer group transition-all">
-          <div class="p-1">
-            <lucide-icon [name]="'Book'" class="h-4 w-4 text-purple-500" />
-          </div>
+      <div class="mb-0.5">
+        <div 
+          class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer group transition-all"
+          (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'"
+          (mouseleave)="$event.currentTarget.style.background='transparent'"
+        >
+          <lucide-icon [name]="'BookOpen'" class="h-3.5 w-3.5 shrink-0" style="color: var(--accent);" />
           <span 
             [routerLink]="['/dashboard/diaries', diary.id]"
-            routerLinkActive="bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 font-black shadow-sm"
-            class="text-[13px] font-bold text-neutral-700 dark:text-neutral-300 hover:text-purple-500 transition-colors flex-1 px-1 py-0.5 rounded-lg whitespace-nowrap overflow-hidden text-ellipsis"
-          >
-            {{ diary.name }}
-          </span>
+            routerLinkActive="active-nav-item-purple"
+            class="text-[13px] font-medium flex-1 px-1 py-0.5 rounded-md truncate transition-colors"
+            style="color: var(--text-secondary);"
+          >{{ diary.name }}</span>
         </div>
       </div>
     }
 
-    <!-- New Workspace Prompt in Sidebar -->
+    <!-- Add Workspace Button -->
     @if (!isCollapsed()) {
       <button 
         (click)="sidebarActions.openWorkspaceModal()"
-        class="mx-2 mt-6 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/10 transition-all group bg-white/50 dark:bg-neutral-900/50 shadow-sm shadow-black/5"
+        class="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl transition-all group"
+        style="
+          border: 1.5px dashed var(--border-subtle);
+          color: var(--text-muted);
+          font-family: var(--font-sans);
+          font-size: 12px;
+          font-weight: 500;
+        "
+        (mouseenter)="$event.currentTarget.style.borderColor='var(--accent-border)'; $event.currentTarget.style.color='var(--accent)'; $event.currentTarget.style.background='var(--accent-soft)'"
+        (mouseleave)="$event.currentTarget.style.borderColor='var(--border-subtle)'; $event.currentTarget.style.color='var(--text-muted)'; $event.currentTarget.style.background='transparent'"
       >
-        <lucide-icon [name]="'Plus'" class="h-4 w-4 text-neutral-400 group-hover:text-indigo-500 group-hover:scale-125 transition-transform" />
-        <span class="text-xs font-black text-neutral-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Add Workspace</span>
+        <lucide-icon [name]="'Plus'" class="h-3.5 w-3.5 transition-transform group-hover:scale-110 duration-200" />
+        <span>Add Workspace</span>
       </button>
     }
   </nav>
 
   <!-- Bottom Actions -->
-  <div class="p-2 border-t border-neutral-200 dark:border-neutral-800 space-y-1">
+  <div class="px-2 py-2 shrink-0" style="border-top: 1px solid var(--border-subtle);">
     <button 
       routerLink="/dashboard/profile"
-      routerLinkActive="bg-neutral-100 dark:bg-neutral-800 font-bold text-neutral-900 dark:text-white"
-      class="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-xs text-neutral-600 dark:text-neutral-400"
+      routerLinkActive="active-bottom-action"
+      class="w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-xs"
+      style="color: var(--text-muted); font-family: var(--font-sans);"
+      (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
+      (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
     >
-      <lucide-icon [name]="'User'" class="h-4 w-4" />
+      <lucide-icon [name]="'User'" class="h-4 w-4 shrink-0" />
       @if (!isCollapsed()) { <span>Profile</span> }
     </button>
+
     <button 
       (click)="themeService.toggleDarkMode()"
-      class="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-xs text-neutral-600 dark:text-neutral-400"
+      class="w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-xs"
+      style="color: var(--text-muted); font-family: var(--font-sans);"
+      (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
+      (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
     >
-      <lucide-icon [name]="themeService.darkMode() ? 'Sun' : 'Moon'" class="h-4 w-4" />
-      @if (!isCollapsed()) { 
-        <span>{{ themeService.darkMode() ? 'Light Mode' : 'Dark Mode' }}</span> 
-      }
+      <lucide-icon [name]="themeService.darkMode() ? 'Sun' : 'Moon'" class="h-4 w-4 shrink-0" />
+      @if (!isCollapsed()) { <span>{{ themeService.darkMode() ? 'Light Mode' : 'Dark Mode' }}</span> }
     </button>
+
     <button 
       routerLink="/dashboard/settings"
-      routerLinkActive="bg-neutral-100 dark:bg-neutral-800 font-bold text-neutral-900 dark:text-white"
-      class="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-xs text-neutral-600 dark:text-neutral-400"
+      routerLinkActive="active-bottom-action"
+      class="w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-xs"
+      style="color: var(--text-muted); font-family: var(--font-sans);"
+      (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
+      (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
     >
-      <lucide-icon [name]="'Settings'" class="h-4 w-4" />
+      <lucide-icon [name]="'Settings'" class="h-4 w-4 shrink-0" />
       @if (!isCollapsed()) { <span>Settings</span> }
     </button>
-    <button (click)="authService.logout()" class="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-xs text-red-600 dark:text-red-400">
-      <lucide-icon [name]="'LogOut'" class="h-4 w-4" />
+
+    <button 
+      (click)="authService.logout()" 
+      class="w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-xs"
+      style="color: #ef4444; font-family: var(--font-sans);"
+      (mouseenter)="$event.currentTarget.style.background='rgba(239,68,68,0.07)'"
+      (mouseleave)="$event.currentTarget.style.background='transparent'"
+    >
+      <lucide-icon [name]="'LogOut'" class="h-4 w-4 shrink-0" />
       @if (!isCollapsed()) { <span>Logout</span> }
     </button>
   </div>

@@ -1,33 +1,90 @@
 @reference "tailwindcss";
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* === ngx-editor toolbar === */
 :host ::ng-deep {
-  .NgxEditor {
-    @apply rounded-xl bg-white dark:bg-transparent;
-  }
   .NgxEditor__MenuBar {
-    @apply bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-1.5 shadow-xl shadow-neutral-200/20 dark:shadow-black/20 flex flex-wrap gap-1;
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 14px !important;
+    padding: 6px 8px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    box-shadow: var(--shadow-sm) !important;
   }
+
   .NgxEditor__MenuItem {
-    @apply !p-0 !m-0;
+    padding: 0 !important;
+    margin: 0 !important;
   }
+
   .NgxEditor__MenuItem--Icon {
-    @apply w-9 h-9 flex items-center justify-center rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all text-neutral-600 dark:text-neutral-400 hover:!text-indigo-500 fill-current;
-    svg, path {
-      fill: currentColor;
+    width: 34px !important;
+    height: 34px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    transition: all 0.12s ease !important;
+    color: var(--text-secondary) !important;
+
+    &:hover {
+      background: var(--bg-base) !important;
+      color: var(--accent) !important;
     }
+
     &.NgxEditor__MenuItem--Active {
-      @apply !bg-indigo-100 dark:!bg-indigo-900/40 !text-indigo-600 dark:!text-indigo-400;
+      background: var(--accent-soft) !important;
+      color: var(--accent) !important;
+    }
+
+    svg, path {
+      fill: currentColor !important;
     }
   }
+
   .NgxEditor__Separator {
-    @apply w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-1;
+    width: 1px !important;
+    height: 20px !important;
+    background: var(--border-subtle) !important;
+    margin: auto 4px !important;
+    align-self: center !important;
+    flex: none !important;
   }
+
   .NgxEditor__Content {
-    @apply border-none p-0 focus:ring-0 min-h-[70vh] text-lg leading-relaxed text-neutral-800 dark:text-neutral-200;
-    * {
-       @apply !outline-none;
-    }
+    border: none !important;
+    padding: 0 !important;
+    min-height: 65vh;
+    font-size: 16px !important;
+    line-height: 1.8 !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-sans) !important;
+
+    * { outline: none !important; }
+
+    p { margin-bottom: 1em; }
+    h1, h2, h3 { font-weight: 700; }
   }
+
   .NgxEditor__Placeholder {
-    @apply text-neutral-400 dark:text-neutral-600 italic font-medium;
+    color: var(--text-muted) !important;
+    font-style: italic !important;
+  }
+
+  .NgxEditor {
+    background: transparent !important;
+    border: none !important;
+  }
+
+  .NgxEditor__Wrapper {
+    border: none !important;
+    background: transparent !important;
   }
 }

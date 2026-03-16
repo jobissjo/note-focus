@@ -1,76 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
-@layer base {
-  body {
-    @apply font-sans antialiased text-neutral-900 bg-neutral-50 dark:text-neutral-100 dark:bg-neutral-950;
-  }
-}
 
-@layer utilities {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-neutral-300 dark:bg-neutral-700 rounded-full;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-400 dark:bg-neutral-600;
-  }
-}
-
+/* ─── Design Tokens ─────────────────────────────────────────────────── */
 :root {
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --accent:         #7C5CFF;
+  --accent-soft:    #f0ecff;
+  --accent-border:  #c4b5fd;
+  --accent-glow:    rgba(124, 92, 255, 0.18);
+
+  --bg-base:        #f7f7f9;
+  --bg-surface:     #ffffff;
+  --bg-elevated:    #ffffff;
+  --border-subtle:  rgba(0, 0, 0, 0.07);
+
+  --text-primary:   #111214;
+  --text-secondary: #6b7280;
+  --text-muted:     #9ca3af;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.07), 0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,.10), 0 4px 12px rgba(0,0,0,.05);
+
+  --sidebar-width: 256px;
 }
 
 .dark {
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
+  --accent:         #7C5CFF;
+  --accent-soft:    rgba(124, 92, 255, 0.15);
+  --accent-border:  rgba(124, 92, 255, 0.4);
+  --accent-glow:    rgba(124, 92, 255, 0.22);
+
+  --bg-base:        #0f0f11;
+  --bg-surface:     #111214;
+  --bg-elevated:    #18191c;
+  --border-subtle:  rgba(255, 255, 255, 0.06);
+
+  --text-primary:   #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted:     #52525b;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.3);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.4);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,.5);
 }
 
-/* ngx-editor Dark Mode Overrides */
+/* ─── Base ───────────────────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    @apply antialiased;
+  }
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────────────── */
+@layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156,163,175,0.4) transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(156,163,175,0.3);
+    border-radius: 99px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 92, 255, 0.4);
+  }
+
+  /* Reusable accent classes */
+  .accent-bg   { background-color: var(--accent); }
+  .accent-text { color: var(--accent); }
+  .accent-border { border-color: var(--accent-border); }
+}
+
+/* ─── ngx-editor Overrides (Light) ──────────────────────────────────── */
+.NgxEditor__Wrapper {
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+.NgxEditor {
+  background: transparent !important;
+  border: none !important;
+}
+.NgxEditor__Content {
+  font-family: var(--font-sans) !important;
+}
+
+/* ─── ngx-editor Overrides (Dark) ───────────────────────────────────── */
 .dark .NgxEditor__Wrapper {
-  @apply !border-neutral-800 !bg-neutral-950;
+  border-color: var(--border-subtle) !important;
+  background: var(--bg-surface) !important;
 }
 .dark .NgxEditor {
-  @apply !bg-neutral-950 !text-neutral-100 !border-neutral-800;
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border: none !important;
 }
 .dark .NgxEditor__MenuBar {
-  @apply !bg-neutral-950 !border-neutral-800 !border-b;
+  background: var(--bg-elevated) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
 }
 .dark .NgxEditor__MenuItem {
-  @apply !text-neutral-400;
+  color: var(--text-secondary) !important;
 }
 .dark .NgxEditor__MenuItem:hover {
-  @apply !bg-neutral-800 !text-white;
+  background: rgba(255,255,255,0.06) !important;
+  color: #fff !important;
 }
 .dark .NgxEditor__MenuItem.NgxEditor__MenuItem--Active {
-  @apply !bg-neutral-800 !text-indigo-400;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
 }
 .dark .NgxEditor__Dropdown {
-  @apply !bg-neutral-950 !border-neutral-800;
+  background: var(--bg-elevated) !important;
+  border-color: var(--border-subtle) !important;
 }
 .dark .NgxEditor__Dropdown .NgxEditor__Dropdown--Text {
-  @apply !text-neutral-300;
+  color: var(--text-secondary) !important;
 }
 .dark .NgxEditor__Dropdown .NgxEditor__Dropdown--Item:hover:not(.NgxEditor__Dropdown--Item--Disabled) {
-  @apply !bg-neutral-800 !text-white;
+  background: rgba(255,255,255,0.06) !important;
+  color: #fff !important;
 }
 .dark .NgxEditor__Dropdown .NgxEditor__Dropdown--Item--Active {
-  @apply !bg-neutral-800 !text-indigo-400;
+  background: var(--accent-soft) !important;
+  color: var(--accent) !important;
 }
 .dark .NgxEditor__Popup {
-  @apply !bg-neutral-900 !border-neutral-800 !text-neutral-200;
+  background: var(--bg-elevated) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--text-secondary) !important;
 }
 .dark .NgxEditor__Popup input {
-  @apply !bg-neutral-800 !border-neutral-700 !text-white;
+  background: var(--bg-base) !important;
+  border-color: var(--border-subtle) !important;
+  color: #fff !important;
 }
-
-.dark .NgxEditor__MenuItem svg, 
+.dark .NgxEditor__MenuItem svg,
 .dark .NgxEditor__MenuItem path {
   fill: currentColor !important;
 }

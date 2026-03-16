@@ -1,33 +1,68 @@
 @reference "tailwindcss";
+
+:host {
+  display: flex;
+  height: 100%;
+}
+
+/* Entry card base */
+.entry-card {
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+.entry-card:hover {
+  background: var(--bg-base);
+  border-color: var(--border-subtle);
+}
+
+/* Active entry */
+.entry-card--active {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-border) !important;
+}
+.entry-card--active .text-sm {
+  color: var(--accent) !important;
+  font-weight: 700 !important;
+}
+
+/* ngx-editor overrides for diary */
 :host ::ng-deep {
-  .NgxEditor {
-    @apply rounded-xl bg-white dark:bg-transparent;
-  }
   .NgxEditor__MenuBar {
-    @apply bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-1.5 shadow-xl shadow-neutral-200/20 dark:shadow-black/20 flex flex-wrap gap-1;
+    @apply bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-1.5 shadow-xl flex flex-wrap gap-1;
   }
   .NgxEditor__MenuItem {
     @apply !p-0 !m-0;
   }
   .NgxEditor__MenuItem--Icon {
-    @apply w-9 h-9 flex items-center justify-center rounded-xl hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-all text-neutral-600 dark:text-neutral-400 hover:!text-purple-500 fill-current;
-    svg, path {
-      fill: currentColor;
-    }
+    @apply w-9 h-9 flex items-center justify-center rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all;
+    color: var(--text-secondary);
+    &:hover { color: var(--accent); }
     &.NgxEditor__MenuItem--Active {
-      @apply !bg-purple-100 dark:!bg-purple-900/40 !text-purple-600 dark:!text-purple-400;
+      background: var(--accent-soft) !important;
+      color: var(--accent) !important;
     }
+    svg, path { fill: currentColor; }
   }
   .NgxEditor__Separator {
     @apply w-px h-4 bg-neutral-200 dark:bg-neutral-800 mx-1;
   }
   .NgxEditor__Content {
-    @apply border-none p-0 focus:ring-0 min-h-[70vh] text-lg leading-relaxed text-neutral-800 dark:text-neutral-200 bg-transparent;
-    * {
-       @apply !outline-none;
-    }
+    border: none !important;
+    padding: 0 !important;
+    min-height: 65vh;
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    * { outline: none !important; }
   }
   .NgxEditor__Placeholder {
-    @apply text-neutral-400 dark:text-neutral-600 italic font-medium;
+    color: var(--text-muted) !important;
+    font-style: italic;
+  }
+  .NgxEditor {
+    background: transparent !important;
+    border: none !important;
   }
 }
