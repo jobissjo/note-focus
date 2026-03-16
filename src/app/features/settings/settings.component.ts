@@ -77,8 +77,8 @@ import { LucideAngularModule } from 'lucide-angular';
               routerLink="/dashboard/profile"
               class="px-4 py-2 rounded-lg text-xs font-semibold transition-all"
               style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
-              (mouseenter)="$event.currentTarget.style.borderColor='var(--accent-border)'; $event.currentTarget.style.color='var(--accent)'"
-              (mouseleave)="$event.currentTarget.style.borderColor='var(--border-subtle)'; $event.currentTarget.style.color='var(--text-secondary)'"
+              (mouseenter)="$any($event.currentTarget).style.borderColor='var(--accent-border)'; $any($event.currentTarget).style.color='var(--accent)'"
+              (mouseleave)="$any($event.currentTarget).style.borderColor='var(--border-subtle)'; $any($event.currentTarget).style.color='var(--text-secondary)'"
             >Manage Profile</button>
           </div>
         </section>
