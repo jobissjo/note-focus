@@ -73,8 +73,8 @@
         <div 
           class="flex items-center gap-1 px-1.5 py-1.5 rounded-lg cursor-pointer group transition-all"
           style="font-family: var(--font-sans);"
-          (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'" 
-          (mouseleave)="$event.currentTarget.style.background='transparent'"
+          (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'" 
+          (mouseleave)="$any($event.currentTarget).style.background='transparent'"
         >
           <button 
             (click)="toggleWorkspace(workspace.id)"
@@ -94,8 +94,8 @@
             (click)="$event.stopPropagation(); sidebarActions.openNotebookModal(workspace)"
             class="opacity-0 group-hover:opacity-100 p-1.5 rounded-md transition-all"
             style="color: var(--text-muted);"
-            (mouseenter)="$event.currentTarget.style.color='var(--accent)'"
-            (mouseleave)="$event.currentTarget.style.color='var(--text-muted)'"
+            (mouseenter)="$any($event.currentTarget).style.color='var(--accent)'"
+            (mouseleave)="$any($event.currentTarget).style.color='var(--text-muted)'"
           >
             <lucide-icon [name]="'Plus'" class="h-3 w-3" />
           </button>
@@ -108,8 +108,8 @@
               <div>
                 <div 
                   class="flex items-center gap-1 px-1.5 py-1.5 rounded-lg cursor-pointer group transition-all"
-                  (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'"
-                  (mouseleave)="$event.currentTarget.style.background='transparent'"
+                  (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
+                  (mouseleave)="$any($event.currentTarget).style.background='transparent'"
                 >
                   <button 
                     (click)="toggleNotebook(workspace.id, notebook.id)"
@@ -131,8 +131,8 @@
                     (click)="$event.stopPropagation(); createNote(workspace.id, notebook.id)"
                     class="opacity-0 group-hover:opacity-100 p-1 rounded transition-all"
                     style="color: var(--text-muted);"
-                    (mouseenter)="$event.currentTarget.style.color='var(--accent)'"
-                    (mouseleave)="$event.currentTarget.style.color='var(--text-muted)'"
+                    (mouseenter)="$any($event.currentTarget).style.color='var(--accent)'"
+                    (mouseleave)="$any($event.currentTarget).style.color='var(--text-muted)'"
                   >
                     <lucide-icon [name]="'Plus'" class="h-3 w-3" />
                   </button>
@@ -146,8 +146,8 @@
                         [routerLink]="['/dashboard/notes', note.id]"
                         routerLinkActive="active-nav-item"
                         class="flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer group transition-all"
-                        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'"
-                        (mouseleave)="$event.currentTarget.style.background='transparent'"
+                        (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
+                        (mouseleave)="$any($event.currentTarget).style.background='transparent'"
                       >
                         <lucide-icon [name]="'FileText'" class="h-3 w-3 shrink-0 transition-colors" style="color: var(--text-muted);" />
                         <span class="text-[11px] truncate transition-colors" style="color: var(--text-muted);">{{ note.title || 'Untitled Note' }}</span>
@@ -174,8 +174,8 @@
           routerLink="/dashboard/diaries"
           class="p-1 rounded-md transition-all opacity-0 hover:opacity-100"
           style="color: var(--text-muted);"
-          (mouseenter)="$event.currentTarget.style.color='var(--accent)'"
-          (mouseleave)="$event.currentTarget.style.color='var(--text-muted)'"
+          (mouseenter)="$any($event.currentTarget).style.color='var(--accent)'"
+          (mouseleave)="$any($event.currentTarget).style.color='var(--text-muted)'"
         >
           <lucide-icon [name]="'Plus'" class="h-3 w-3" />
         </button>
@@ -187,8 +187,8 @@
       <div class="mb-0.5">
         <div 
           class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer group transition-all"
-          (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'"
-          (mouseleave)="$event.currentTarget.style.background='transparent'"
+          (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
+          (mouseleave)="$any($event.currentTarget).style.background='transparent'"
         >
           <lucide-icon [name]="'BookOpen'" class="h-3.5 w-3.5 shrink-0" style="color: var(--accent);" />
           <span 
@@ -213,8 +213,8 @@
           font-size: 12px;
           font-weight: 500;
         "
-        (mouseenter)="$event.currentTarget.style.borderColor='var(--accent-border)'; $event.currentTarget.style.color='var(--accent)'; $event.currentTarget.style.background='var(--accent-soft)'"
-        (mouseleave)="$event.currentTarget.style.borderColor='var(--border-subtle)'; $event.currentTarget.style.color='var(--text-muted)'; $event.currentTarget.style.background='transparent'"
+        (mouseenter)="$any($event.currentTarget).style.borderColor='var(--accent-border)'; $any($event.currentTarget).style.color='var(--accent)'; $any($event.currentTarget).style.background='var(--accent-soft)'"
+        (mouseleave)="$any($event.currentTarget).style.borderColor='var(--border-subtle)'; $any($event.currentTarget).style.color='var(--text-muted)'; $any($event.currentTarget).style.background='transparent'"
       >
         <lucide-icon [name]="'Plus'" class="h-3.5 w-3.5 transition-transform group-hover:scale-110 duration-200" />
         <span>Add Workspace</span>
@@ -229,8 +229,8 @@
       routerLinkActive="active-bottom-action"
       class="w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-xs"
       style="color: var(--text-muted); font-family: var(--font-sans);"
-      (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
-      (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+      (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'; $any($event.currentTarget).style.color='var(--text-primary)'"
+      (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
     >
       <lucide-icon [name]="'User'" class="h-4 w-4 shrink-0" />
       @if (!isCollapsed()) { <span>Profile</span> }
@@ -240,8 +240,8 @@
       (click)="themeService.toggleDarkMode()"
       class="w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-xs"
       style="color: var(--text-muted); font-family: var(--font-sans);"
-      (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
-      (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+      (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'; $any($event.currentTarget).style.color='var(--text-primary)'"
+      (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
     >
       <lucide-icon [name]="themeService.darkMode() ? 'Sun' : 'Moon'" class="h-4 w-4 shrink-0" />
       @if (!isCollapsed()) { <span>{{ themeService.darkMode() ? 'Light Mode' : 'Dark Mode' }}</span> }
@@ -252,8 +252,8 @@
       routerLinkActive="active-bottom-action"
       class="w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-xs"
       style="color: var(--text-muted); font-family: var(--font-sans);"
-      (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
-      (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+      (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'; $any($event.currentTarget).style.color='var(--text-primary)'"
+      (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
     >
       <lucide-icon [name]="'Settings'" class="h-4 w-4 shrink-0" />
       @if (!isCollapsed()) { <span>Settings</span> }
@@ -263,8 +263,8 @@
       (click)="authService.logout()" 
       class="w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-xs"
       style="color: #ef4444; font-family: var(--font-sans);"
-      (mouseenter)="$event.currentTarget.style.background='rgba(239,68,68,0.07)'"
-      (mouseleave)="$event.currentTarget.style.background='transparent'"
+      (mouseenter)="$any($event.currentTarget).style.background='rgba(239,68,68,0.07)'"
+      (mouseleave)="$any($event.currentTarget).style.background='transparent'"
     >
       <lucide-icon [name]="'LogOut'" class="h-4 w-4 shrink-0" />
       @if (!isCollapsed()) { <span>Logout</span> }

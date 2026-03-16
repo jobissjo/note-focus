@@ -12,8 +12,8 @@
         [routerLink]="['/dashboard/diaries']" 
         class="p-1.5 rounded-lg transition-all shrink-0"
         style="color: var(--text-muted);"
-        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
-        (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+        (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'; $any($event.currentTarget).style.color='var(--text-primary)'"
+        (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
       >
         <lucide-icon [name]="'ChevronLeft'" class="h-4 w-4" />
       </button>
@@ -50,8 +50,8 @@
                 (click)="$event.stopPropagation(); openEditEntryModal(entry)" 
                 class="p-1.5 rounded-md transition-all"
                 style="color: var(--text-muted);"
-                (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
-                (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+                (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'; $any($event.currentTarget).style.color='var(--text-primary)'"
+                (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
               >
                 <lucide-icon [name]="'Pencil'" class="h-3 w-3" />
               </button>
@@ -59,8 +59,8 @@
                 (click)="$event.stopPropagation(); onDeleteEntry(entry)" 
                 class="p-1.5 rounded-md transition-all"
                 style="color: var(--text-muted);"
-                (mouseenter)="$event.currentTarget.style.background='rgba(239,68,68,0.08)'; $event.currentTarget.style.color='#ef4444'"
-                (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+                (mouseenter)="$any($event.currentTarget).style.background='rgba(239,68,68,0.08)'; $any($event.currentTarget).style.color='#ef4444'"
+                (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
               >
                 <lucide-icon [name]="'Trash2'" class="h-3 w-3" />
               </button>
@@ -85,8 +85,8 @@
         (click)="openCreateEntryModal()"
         class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
         style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
-        (mouseenter)="$event.currentTarget.style.opacity='0.9'"
-        (mouseleave)="$event.currentTarget.style.opacity='1'"
+        (mouseenter)="$any($event.currentTarget).style.opacity='0.9'"
+        (mouseleave)="$any($event.currentTarget).style.opacity='1'"
       >
         <lucide-icon [name]="'Plus'" class="h-4 w-4" />
         <span>New Entry</span>
@@ -158,8 +158,8 @@
           (click)="openCreateEntryModal()"
           class="flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
           style="background: var(--accent); box-shadow: 0 4px 20px var(--accent-glow);"
-          (mouseenter)="$event.currentTarget.style.opacity='0.9'"
-          (mouseleave)="$event.currentTarget.style.opacity='1'"
+          (mouseenter)="$any($event.currentTarget).style.opacity='0.9'"
+          (mouseleave)="$any($event.currentTarget).style.opacity='1'"
         >
           <lucide-icon [name]="'Plus'" class="h-4 w-4" />
           <span>Write First Entry</span>

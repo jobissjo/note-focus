@@ -49,15 +49,15 @@
 
       <button class="p-2 rounded-lg transition-all"
         style="color: var(--text-muted);"
-        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
-        (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+        (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'; $any($event.currentTarget).style.color='var(--text-primary)'"
+        (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
       >
         <lucide-icon [name]="'Share2'" class="h-4 w-4" />
       </button>
       <button class="p-2 rounded-lg transition-all"
         style="color: var(--text-muted);"
-        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'; $event.currentTarget.style.color='var(--text-primary)'"
-        (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+        (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'; $any($event.currentTarget).style.color='var(--text-primary)'"
+        (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
       >
         <lucide-icon [name]="'Maximize2'" class="h-4 w-4" />
       </button>
@@ -65,8 +65,8 @@
         (click)="onDeleteNote()"
         class="p-2 rounded-lg transition-all"
         style="color: var(--text-muted);"
-        (mouseenter)="$event.currentTarget.style.background='rgba(239,68,68,0.07)'; $event.currentTarget.style.color='#ef4444'"
-        (mouseleave)="$event.currentTarget.style.background='transparent'; $event.currentTarget.style.color='var(--text-muted)'"
+        (mouseenter)="$any($event.currentTarget).style.background='rgba(239,68,68,0.07)'; $any($event.currentTarget).style.color='#ef4444'"
+        (mouseleave)="$any($event.currentTarget).style.background='transparent'; $any($event.currentTarget).style.color='var(--text-muted)'"
       >
         <lucide-icon [name]="'Trash2'" class="h-4 w-4" />
       </button>

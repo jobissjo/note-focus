@@ -29,8 +29,8 @@
         (click)="isMobileMenuOpen.set(true)"
         class="p-2 rounded-lg transition-all"
         style="color: var(--text-muted);"
-        (mouseenter)="$event.currentTarget.style.background='var(--bg-base)'"
-        (mouseleave)="$event.currentTarget.style.background='transparent'"
+        (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
+        (mouseleave)="$any($event.currentTarget).style.background='transparent'"
       >
         <lucide-icon [name]="'Menu'" class="h-5 w-5" />
       </button>
