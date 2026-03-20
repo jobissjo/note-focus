@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000/api', // Adjust based on NestJS default
+  apiUrl: 'https://note-focus.vercel.app/api', // Adjust based on NestJS default
 };
