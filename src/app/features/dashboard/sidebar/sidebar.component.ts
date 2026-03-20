@@ -9,6 +9,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { SidebarActionsService } from '../../../core/services/sidebar-actions.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { DiaryService } from '../../../core/services/diary.service';
+import { StoryService } from '../../../core/services/story.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -26,6 +27,7 @@ export class SidebarComponent implements OnInit {
   sidebarActions = inject(SidebarActionsService);
   themeService = inject(ThemeService);
   diaryService = inject(DiaryService);
+  storyService = inject(StoryService);
 
   isCollapsed = signal(false);
   expandedWorkspaces = signal<Set<string>>(new Set());
@@ -49,6 +51,7 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit() {
     this.diaryService.fetchDiaries().subscribe();
+    this.storyService.getStories().subscribe();
   }
 
   createNote(workspaceId: string, notebookId: string) {

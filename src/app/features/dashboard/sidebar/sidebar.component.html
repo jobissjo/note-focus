@@ -59,7 +59,7 @@
     @if (!isCollapsed()) {
       <div class="px-2 pt-4 pb-1.5 flex items-center justify-between">
         <span 
-          routerLink="/dashboard"
+          routerLink="/dashboard/workspaces"
           class="text-[10px] font-semibold tracking-widest uppercase cursor-pointer transition-colors hover:opacity-100 opacity-50"
           style="color: var(--text-primary); letter-spacing: 0.1em;"
         >Workspaces</span>
@@ -197,6 +197,43 @@
             class="text-[13px] font-medium flex-1 px-1 py-0.5 rounded-md truncate transition-colors"
             style="color: var(--text-secondary);"
           >{{ diary.name }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Stories Section Label -->
+    @if (!isCollapsed()) {
+      <div class="px-2 pt-5 pb-1.5 flex items-center justify-between">
+        <span 
+          routerLink="/dashboard/stories"
+          class="text-[10px] font-semibold tracking-widest uppercase cursor-pointer transition-colors hover:opacity-100 opacity-50"
+          style="color: var(--text-primary); letter-spacing: 0.1em;"
+        >Stories</span>
+        <button 
+          routerLink="/dashboard/stories"
+          class="p-1 rounded-md transition-all opacity-0 hover:opacity-100"
+          style="color: var(--text-muted);"
+          (mouseenter)="$any($event.currentTarget).style.color='var(--accent)'"
+          (mouseleave)="$any($event.currentTarget).style.color='var(--text-muted)'"
+        >
+          <lucide-icon [name]="'Plus'" class="h-3 w-3" />
+        </button>
+      </div>
+    }
+
+    <!-- Story Items -->
+    @for (story of storyService.stories(); track story.id) {
+      <div class="mb-0.5" [routerLink]="['/dashboard/stories', story.id]" routerLinkActive="active-nav-item-purple">
+        <div 
+          class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer group transition-all"
+          (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
+          (mouseleave)="$any($event.currentTarget).style.background='transparent'"
+        >
+          <lucide-icon [name]="'StickyNote'" class="h-3.5 w-3.5 shrink-0" style="color: var(--accent);" />
+          <span 
+            class="text-[13px] font-medium flex-1 px-1 py-0.5 rounded-md truncate transition-colors"
+            style="color: var(--text-secondary);"
+          >{{ story.title }}</span>
         </div>
       </div>
     }

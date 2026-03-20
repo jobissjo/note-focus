@@ -1,0 +1,73 @@
+<div class="flex flex-col h-full overflow-hidden" style="background: var(--bg-surface);">
+    <!-- Editor Header -->
+    <header class="h-16 flex items-center justify-between px-6 shrink-0" style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-surface);">
+      <div class="flex items-center gap-4 min-w-0">
+        <a [routerLink]="['/dashboard/stories']" 
+           class="p-2 rounded-lg transition-all" 
+           style="color: var(--text-muted);"
+           (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
+           (mouseleave)="$any($event.currentTarget).style.background='transparent'"
+        >
+          <lucide-icon [name]="'ChevronLeft'" class="h-5 w-5" />
+        </a>
+        
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="h-8 w-8 rounded-lg flex items-center justify-center shrink-0" style="background: var(--accent-soft);">
+            <lucide-icon [name]="'Sparkles'" class="h-4 w-4" style="color: var(--accent);" />
+          </div>
+          <input 
+            #titleInput
+            [ngModel]="storyService.activeStory()?.title"
+            (ngModelChange)="updateTitle($event)"
+            type="text" 
+            placeholder="Story Title"
+            class="text-sm font-bold bg-transparent border-none outline-none truncate w-full"
+            style="color: var(--text-primary);"
+          />
+        </div>
+      </div>
+  
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2 mr-4 text-[11px] font-medium transition-all duration-300" 
+             [style.opacity]="isSaving() ? '1' : '0.5'"
+             style="color: var(--text-muted);">
+          @if (isSaving()) {
+            <lucide-icon [name]="'Loader2'" class="h-3 w-3 animate-spin" />
+            <span>Saving...</span>
+          } @else {
+            <lucide-icon [name]="'Clock'" class="h-3 w-3" />
+            <span>Last updated {{ storyService.activeStory()?.updatedAt | date:'shortTime' }}</span>
+          }
+        </div>
+  
+        <div class="h-8 w-[1px] mx-1" style="background: var(--border-subtle);"></div>
+  
+        <button 
+          (click)="onDeleteStory()"
+          class="p-2 rounded-lg transition-all hover:bg-red-50 hover:text-red-500" 
+          style="color: var(--text-muted);"
+        >
+          <lucide-icon [name]="'Trash2'" class="h-4.5 w-4.5" />
+        </button>
+      </div>
+    </header>
+  
+    <!-- Editor Toolbar -->
+    <div class="px-6 py-2 shrink-0 flex items-center gap-2" style="border-bottom: 1px solid var(--border-subtle); background: var(--bg-base);">
+      <ngx-editor-menu [editor]="editor" [toolbar]="toolbar" class="w-full"></ngx-editor-menu>
+    </div>
+  
+    <!-- Editor Content -->
+    <main class="flex-1 overflow-y-auto custom-scrollbar p-12 lg:p-20">
+      <div class="max-w-4xl mx-auto">
+        <div class="editor-container" style="color: var(--text-primary);">
+          <ngx-editor
+            [editor]="editor"
+            [ngModel]="content()"
+            (ngModelChange)="onContentChange($event)"
+            [placeholder]="'Begin your masterpiece...'"
+          ></ngx-editor>
+        </div>
+      </div>
+    </main>
+  </div>

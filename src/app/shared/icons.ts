@@ -39,7 +39,11 @@ import {
   CheckCircle2,
   Palette,
   Bell,
-  AlertTriangle
+  AlertTriangle,
+  Sparkles,
+  Zap,
+  Star,
+  TrendingUp
 } from 'lucide-angular';
 
 export const ICONS = {
@@ -83,5 +87,9 @@ export const ICONS = {
   CheckCircle2,
   Palette,
   Bell,
-  AlertTriangle
+  AlertTriangle,
+  Sparkles,
+  Zap,
+  Star,
+  TrendingUp
 };

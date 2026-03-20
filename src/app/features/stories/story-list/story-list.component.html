@@ -1,0 +1,131 @@
+<div class="min-h-full px-8 py-10 max-w-6xl mx-auto" style="font-family: var(--font-sans);">
+  <!-- Page Header -->
+  <header class="flex items-center justify-between mb-10">
+    <div>
+      <div class="flex items-center gap-2.5 mb-2">
+        <div class="h-9 w-9 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+          <lucide-icon [name]="'Sparkles'" class="h-5 w-5" style="color: var(--accent);" />
+        </div>
+        <h1 class="text-2xl font-bold" style="color: var(--text-primary);">Stories</h1>
+      </div>
+      <p class="text-sm" style="color: var(--text-muted);">Manage your personal stories and creative drafts.</p>
+    </div>
+    <button 
+      (click)="openCreateModal()"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
+      style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+    >
+      <lucide-icon [name]="'Plus'" class="h-4 w-4" />
+      <span>New Story</span>
+    </button>
+  </header>
+
+  <!-- Create/Edit Modal -->
+  @if (showCreateModal()) {
+    <app-modal [title]="activeStoryForEdit() ? 'Edit Story Title' : 'Create New Story'" (close)="showCreateModal.set(false)">
+      <form [formGroup]="storyForm" (ngSubmit)="onSubmit()" class="space-y-5">
+        <div class="space-y-1.5">
+          <label class="text-xs font-semibold uppercase tracking-wide" style="color: var(--text-muted);">Story Title</label>
+          <input 
+            formControlName="title"
+            type="text" 
+            placeholder="A Long Night, The Hidden Door..."
+            class="w-full rounded-xl py-3 px-4 outline-none transition-all text-sm"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-primary); font-family: var(--font-sans);"
+          />
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+          <button 
+            type="button"
+            (click)="showCreateModal.set(false)"
+            class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
+            style="background: var(--bg-base); color: var(--text-secondary); border: 1px solid var(--border-subtle);"
+          >Cancel</button>
+          <button 
+            [disabled]="storyForm.invalid || isSubmitting()"
+            type="submit"
+            class="flex-[2] py-3 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all disabled:opacity-50 active:scale-95"
+            style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+          >
+            @if (isSubmitting()) {
+              <lucide-icon [name]="'Loader2'" class="h-4 w-4 animate-spin" />
+              <span>Saving...</span>
+            } @else {
+              <span>Save Story</span>
+            }
+          </button>
+        </div>
+      </form>
+    </app-modal>
+  }
+
+  <!-- Stories Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    @for (story of storyService.stories(); track story.id) {
+      <div 
+        class="story-card group relative rounded-2xl p-6 cursor-pointer transition-all"
+        style="
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          box-shadow: var(--shadow-sm);
+        "
+      >
+        <!-- Actions on hover -->
+        <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <button 
+            (click)="$event.stopPropagation(); openEditModal(story)"
+            class="p-2 rounded-lg transition-all"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
+          >
+            <lucide-icon [name]="'Pencil'" class="h-3.5 w-3.5" />
+          </button>
+          <button 
+            (click)="$event.stopPropagation(); onDeleteStory(story)"
+            class="p-2 rounded-lg transition-all hover:bg-red-50 hover:text-red-500"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
+          >
+            <lucide-icon [name]="'Trash2'" class="h-3.5 w-3.5" />
+          </button>
+        </div>
+
+        <div [routerLink]="['/dashboard/stories', story.id]">
+          <!-- Icon -->
+          <div class="h-11 w-11 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-105 duration-200"
+            style="background: var(--accent-soft);"
+          >
+            <lucide-icon [name]="'BookOpen'" class="h-5.5 w-5.5" style="color: var(--accent);" />
+          </div>
+          <!-- Title -->
+          <h3 class="text-base font-bold mb-1 transition-colors group-hover:text-[var(--accent)]" style="color: var(--text-primary);">
+            {{ story.title }}
+          </h3>
+          <!-- Meta -->
+          <div class="flex items-center gap-1.5 text-[11px] font-medium mt-4" style="color: var(--text-muted);">
+            <lucide-icon [name]="'CalendarDays'" class="h-3 w-3" />
+            <span>Updated {{ story.updatedAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (storyService.stories().length === 0) {
+      <div class="col-span-full py-20 text-center rounded-2xl" style="border: 2px dashed var(--border-subtle);">
+        <div class="h-16 w-16 rounded-3xl mx-auto mb-5 flex items-center justify-center" style="background: var(--accent-soft);">
+          <lucide-icon [name]="'BookPlus'" class="h-8 w-8" style="color: var(--accent);" />
+        </div>
+        <h3 class="text-lg font-bold mb-2" style="color: var(--text-primary);">No stories yet</h3>
+        <p class="text-sm mb-6" style="color: var(--text-muted);">Start your creative adventure by writing your first story.</p>
+        <button 
+          (click)="openCreateModal()"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
+          style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+        >
+          <lucide-icon [name]="'Plus'" class="h-4 w-4" />
+          <span>Create Story</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

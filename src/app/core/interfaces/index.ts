@@ -63,3 +63,36 @@ export interface DiaryEntry {
   createdAt: string; 
   updatedAt: string;
 }
+
+export interface Story {
+  id: string;
+  title: string;
+  content: any; // JSON based rich text
+  emoji?: string;
+  createdById: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DashboardStats {
+  workspaces: number;
+  journals: number;
+  stories: number;
+}
+
+export interface DashboardRecentItem {
+  id: string;
+  type: 'note' | 'journal' | 'story';
+  title: string;
+  updatedAt: string;
+  metadata?: {
+    workspaceId?: string;
+    notebookId?: string;
+    diaryId?: string;
+  };
+}
+
+export interface DashboardSummary {
+  stats: DashboardStats;
+  recentActivity: DashboardRecentItem[];
+}
