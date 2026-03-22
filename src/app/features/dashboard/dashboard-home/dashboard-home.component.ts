@@ -5,6 +5,9 @@ import { LucideAngularModule, Sparkles, BookOpen, LayoutGrid, Plus, Clock, FileT
 import { AuthService } from '../../../core/services/auth.service';
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { DashboardRecentItem } from '../../../core/interfaces';
+import { Router } from '@angular/router';
+import { AlertService } from '../../../core/services/alert.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dashboard-home',
@@ -16,6 +19,8 @@ import { DashboardRecentItem } from '../../../core/interfaces';
 export class DashboardHomeComponent implements OnInit {
   authService = inject(AuthService);
   dashboardService = inject(DashboardService);
+  private alertService = inject(AlertService);
+  private router = inject(Router);
   isLoading = signal(true);
 
   // Stats from service summary signal
@@ -63,5 +68,53 @@ export class DashboardHomeComponent implements OnInit {
   getItemLink(item: DashboardRecentItem): string[] {
     const { link } = this.getTypeStyles(item.type);
     return [...link, item.id];
+  }
+
+  async onRecentItemClick(item: any) {
+    if (item.isLocked) {
+      const isDark = document.documentElement.classList.contains('dark');
+      const { value: pin } = await Swal.fire({
+        title: this.getLockedTitle(item.type),
+        text: 'Please enter your security PIN to access this item.',
+        input: 'password',
+        inputPlaceholder: 'Enter PIN',
+        inputAttributes: {
+          maxlength: '10',
+          autocapitalize: 'off',
+          autocorrect: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Unlock',
+        confirmButtonColor: 'var(--accent)',
+        background: isDark ? '#171717' : '#ffffff',
+        color: isDark ? '#ffffff' : '#171717',
+        customClass: {
+          popup: 'rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl',
+          input: 'rounded-xl border border-neutral-200 dark:border-neutral-800'
+        }
+      });
+
+      if (pin) {
+        this.authService.verifyPin(pin).subscribe({
+          next: () => {
+            this.router.navigate(this.getItemLink(item));
+          },
+          error: (err) => {
+            this.alertService.error('Invalid PIN', err.error?.message || 'Access denied.');
+          }
+        });
+      }
+    } else {
+      this.router.navigate(this.getItemLink(item));
+    }
+  }
+
+  private getLockedTitle(type: string): string {
+    switch (type) {
+      case 'note': return 'Note Locked';
+      case 'journal': return 'Journal Locked';
+      case 'story': return 'Story Locked';
+      default: return 'Locked';
+    }
   }
 }

@@ -166,12 +166,17 @@
         @for (item of recentItems(); track item.id) {
           @let styles = getTypeStyles(item.type);
           <div 
-            [routerLink]="getItemLink(item)"
-            class="group flex items-center gap-4 p-4 rounded-2xl transition-all hover:bg-[var(--bg-base)] cursor-pointer"
+            (click)="onRecentItemClick(item)"
+            class="group flex items-center gap-4 p-4 rounded-2xl transition-all hover:bg-[var(--bg-base)] cursor-pointer relative"
             style="background: var(--bg-surface); border: 1px solid var(--border-subtle);"
           >
-            <div class="h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:rotate-6" [style.background]="styles.color + '15'" [style.color]="styles.color">
+            <div class="h-12 w-12 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:rotate-6 relative" [style.background]="styles.color + '15'" [style.color]="styles.color">
               <lucide-icon [name]="styles.icon" class="h-5.5 w-5.5" />
+              @if (item.isLocked) {
+                <div class="absolute -top-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center bg-white shadow-sm border border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700">
+                  <lucide-icon name="Lock" class="h-2.5 w-2.5" style="color: var(--accent);" />
+                </div>
+              }
             </div>
             
             <div class="flex-1 min-w-0">

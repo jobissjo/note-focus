@@ -5,6 +5,7 @@ export interface User {
   lastName?: string;
   avatar?: string;
   name?: string;
+  hasPin?: boolean;
 }
 
 export interface Workspace {
@@ -13,6 +14,7 @@ export interface Workspace {
   description?: string;
   emoji?: string;
   ownerId: string;
+  isLocked: boolean;
   notebooks?: Notebook[];
   createdAt: string;
   updatedAt: string;
@@ -49,6 +51,7 @@ export interface Diary {
   name: string;
   description?: string;
   ownerId: string;
+  isLocked: boolean;
   entries?: DiaryEntry[];
   createdAt: string; // ISO String
   updatedAt: string; // ISO String
@@ -70,6 +73,7 @@ export interface Story {
   content: any; // JSON based rich text
   emoji?: string;
   createdById: string;
+  isLocked: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -85,6 +89,7 @@ export interface DashboardRecentItem {
   type: 'note' | 'journal' | 'story';
   title: string;
   updatedAt: string;
+  isLocked: boolean;
   metadata?: {
     workspaceId?: string;
     notebookId?: string;

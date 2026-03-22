@@ -2,7 +2,10 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ThemeService } from '../../core/services/theme.service';
+import { AuthService } from '../../core/services/auth.service';
+import { AlertService } from '../../core/services/alert.service';
 import { LucideAngularModule } from 'lucide-angular';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-settings',
@@ -83,6 +86,38 @@ import { LucideAngularModule } from 'lucide-angular';
           </div>
         </section>
 
+        <!-- Security -->
+        <section class="rounded-2xl p-6 transition-all" style="
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          box-shadow: var(--shadow-sm);
+        ">
+          <h2 class="text-sm font-bold flex items-center gap-2 mb-5" style="color: var(--text-primary);">
+            <div class="h-7 w-7 rounded-lg flex items-center justify-center" style="background: var(--accent-soft);">
+              <lucide-icon name="Lock" class="h-3.5 w-3.5" style="color: var(--accent);" />
+            </div>
+            Security
+          </h2>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-semibold" style="color: var(--text-primary);">PIN Protection</h3>
+              <p class="text-xs mt-0.5" style="color: var(--text-muted);">
+                {{ authService.currentUser()?.hasPin ? 'Update your security PIN' : 'Set a PIN to lock items' }}
+              </p>
+            </div>
+            <button 
+              (click)="managePin()"
+              class="px-4 py-2 rounded-lg text-xs font-semibold transition-all"
+              style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
+              (mouseenter)="$any($event.currentTarget).style.borderColor='var(--accent-border)'; $any($event.currentTarget).style.color='var(--accent)'"
+              (mouseleave)="$any($event.currentTarget).style.borderColor='var(--border-subtle)'; $any($event.currentTarget).style.color='var(--text-secondary)'"
+            >
+              {{ authService.currentUser()?.hasPin ? 'Update PIN' : 'Set PIN' }}
+            </button>
+          </div>
+        </section>
+
         <!-- Notifications (Coming Soon) -->
         <section class="rounded-2xl p-6 transition-all" style="
           background: var(--bg-surface);
@@ -114,4 +149,51 @@ import { LucideAngularModule } from 'lucide-angular';
 })
 export class SettingsComponent {
   themeService = inject(ThemeService);
+  authService = inject(AuthService);
+  alertService = inject(AlertService);
+
+  async managePin() {
+    const isDark = document.documentElement.classList.contains('dark');
+    const { value: pin } = await Swal.fire({
+      title: this.authService.currentUser()?.hasPin ? 'Update Security PIN' : 'Set Security PIN',
+      input: 'password',
+      inputLabel: 'Enter a 4-digit or longer PIN',
+      inputPlaceholder: 'Enter PIN',
+      inputAttributes: {
+        maxlength: '10',
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Save PIN',
+      confirmButtonColor: 'var(--accent)',
+      cancelButtonColor: 'var(--text-muted)',
+      background: isDark ? '#171717' : '#ffffff',
+      color: isDark ? '#ffffff' : '#171717',
+      customClass: {
+        popup: 'rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl',
+        input: 'rounded-xl border border-neutral-200 dark:border-neutral-800'
+      },
+      inputValidator: (value) => {
+        if (!value) {
+          return 'You need to enter a PIN!';
+        }
+        if (value.length < 4) {
+          return 'PIN must be at least 4 digits!';
+        }
+        return null;
+      }
+    });
+
+    if (pin) {
+      this.authService.setPin(pin).subscribe({
+        next: () => {
+          this.alertService.success('Success', 'PIN has been successfully updated.');
+        },
+        error: (err) => {
+          this.alertService.error('Error', err.error?.message || 'Failed to update PIN.');
+        }
+      });
+    }
+  }
 }

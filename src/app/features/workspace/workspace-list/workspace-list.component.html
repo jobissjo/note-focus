@@ -48,6 +48,30 @@
             style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-primary); font-family: var(--font-sans);"
           ></textarea>
         </div>
+        
+        <!-- Lock Toggle -->
+        <div class="flex items-center justify-between p-4 rounded-xl" style="background: var(--bg-base); border: 1px solid var(--border-subtle);">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg flex items-center justify-center" [style.background]="workspaceForm.value.isLocked ? 'var(--accent-soft)' : 'var(--bg-surface)'">
+              <lucide-icon [name]="workspaceForm.value.isLocked ? 'Lock' : 'Unlock'" class="h-4 w-4" [style.color]="workspaceForm.value.isLocked ? 'var(--accent)' : 'var(--text-muted)'" />
+            </div>
+            <div>
+              <p class="text-sm font-bold" style="color: var(--text-primary);">Lock Workspace</p>
+              <p class="text-[11px]" style="color: var(--text-muted);">Requires PIN to access</p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            (click)="workspaceForm.patchValue({ isLocked: !workspaceForm.value.isLocked })"
+            class="w-10 h-5 rounded-full transition-all relative shrink-0"
+            [style.background]="workspaceForm.value.isLocked ? 'var(--accent)' : 'var(--border-subtle)'"
+          >
+            <div 
+              class="absolute top-0.5 left-0.5 bg-white h-4 w-4 rounded-full transition-transform shadow-sm"
+              [class.translate-x-5]="workspaceForm.value.isLocked"
+            ></div>
+          </button>
+        </div>
         <div class="flex items-center gap-3 pt-2">
           <button 
             type="button"
@@ -89,6 +113,16 @@
         <!-- Hover Actions -->
         <div class="absolute top-4 right-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
           <button 
+            (click)="$event.stopPropagation(); toggleLock(workspace)"
+            class="p-2 rounded-lg transition-all"
+            [title]="workspace.isLocked ? 'Unlock' : 'Lock'"
+            style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
+            (mouseenter)="$any($event.currentTarget).style.color='var(--accent)'"
+            (mouseleave)="$any($event.currentTarget).style.color='var(--text-secondary)'"
+          >
+            <lucide-icon [name]="workspace.isLocked ? 'Unlock' : 'Lock'" class="h-3.5 w-3.5" />
+          </button>
+          <button 
             (click)="$event.stopPropagation(); openEditModal(workspace)"
             class="p-2 rounded-lg transition-all"
             style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-secondary);"
@@ -108,12 +142,17 @@
           </button>
         </div>
 
-        <div [routerLink]="['/dashboard/workspaces', workspace.id]">
+        <div (click)="onWorkspaceClick(workspace)">
           <!-- Icon / Emoji -->
-          <div class="h-11 w-11 rounded-xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:scale-105 duration-200"
+          <div class="h-11 w-11 rounded-xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:scale-105 duration-200 relative"
             style="background: var(--bg-base); border: 1px solid var(--border-subtle);"
           >
             {{ workspace.emoji || '📂' }}
+            @if (workspace.isLocked) {
+              <div class="absolute -top-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center bg-white shadow-sm border border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700">
+                <lucide-icon name="Lock" class="h-2.5 w-2.5" style="color: var(--accent);" />
+              </div>
+            }
           </div>
           <!-- Name -->
           <h3 class="text-base font-bold mb-1 transition-colors group-hover:text-[var(--accent)]" style="color: var(--text-primary);">

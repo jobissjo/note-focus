@@ -60,6 +60,25 @@ export class AuthService extends BaseApiService {
     this.router.navigate(['/dashboard']);
   }
 
+  setPin(pin: string) {
+    return this.post<{ message: string }>('auth/set-pin', { pin }).pipe(
+      tap(() => {
+        const user = this.currentUser();
+        if (user) {
+          const updatedUser = { ...user, hasPin: true };
+          this.currentUser.set(updatedUser);
+          if (this.isBrowser) {
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        }
+      })
+    );
+  }
+
+  verifyPin(pin: string) {
+    return this.post<{ success: boolean }>('auth/verify-pin', { pin });
+  }
+
   // Optional: Check session on startup
   checkSession() {
     if (!this.isBrowser) return;

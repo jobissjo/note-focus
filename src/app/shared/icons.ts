@@ -43,7 +43,8 @@ import {
   Sparkles,
   Zap,
   Star,
-  TrendingUp
+  TrendingUp,
+  Unlock
 } from 'lucide-angular';
 
 export const ICONS = {
@@ -91,5 +92,6 @@ export const ICONS = {
   Sparkles,
   Zap,
   Star,
-  TrendingUp
+  TrendingUp,
+  Unlock
 };

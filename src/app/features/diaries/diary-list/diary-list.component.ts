@@ -4,9 +4,12 @@ import { RouterModule } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { DiaryService } from '../../../core/services/diary.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { AlertService } from '../../../core/services/alert.service';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { Diary } from '../../../core/interfaces';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-diary-list',
@@ -16,8 +19,10 @@ import { Diary } from '../../../core/interfaces';
 })
 export class DiaryListComponent {
   diaryService = inject(DiaryService);
+  authService = inject(AuthService);
   private alertService = inject(AlertService);
   private fb = inject(FormBuilder);
+  private router = inject(Router);
 
   showCreateModal = signal(false);
   isSubmitting = signal(false);
@@ -25,7 +30,8 @@ export class DiaryListComponent {
 
   diaryForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
-    description: ['']
+    description: [''],
+    isLocked: [false]
   });
 
   openCreateModal() {
@@ -38,9 +44,67 @@ export class DiaryListComponent {
     this.activeDiaryForEdit.set(diary);
     this.diaryForm.patchValue({
       name: diary.name,
-      description: diary.description || ''
+      description: diary.description || '',
+      isLocked: diary.isLocked || false
     });
     this.showCreateModal.set(true);
+  }
+
+  async onDiaryClick(diary: Diary) {
+    if (diary.isLocked) {
+      const isDark = document.documentElement.classList.contains('dark');
+      const { value: pin } = await Swal.fire({
+        title: 'Journal Locked',
+        text: 'Please enter your security PIN to access this journal.',
+        input: 'password',
+        inputPlaceholder: 'Enter PIN',
+        inputAttributes: {
+          maxlength: '10',
+          autocapitalize: 'off',
+          autocorrect: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Unlock',
+        confirmButtonColor: 'var(--accent)',
+        background: isDark ? '#171717' : '#ffffff',
+        color: isDark ? '#ffffff' : '#171717',
+        customClass: {
+          popup: 'rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl',
+          input: 'rounded-xl border border-neutral-200 dark:border-neutral-800'
+        }
+      });
+
+      if (pin) {
+        this.authService.verifyPin(pin).subscribe({
+          next: () => {
+            this.router.navigate(['/dashboard/diaries', diary.id]);
+          },
+          error: (err) => {
+            this.alertService.error('Invalid PIN', err.error?.message || 'Access denied.');
+          }
+        });
+      }
+    } else {
+      this.router.navigate(['/dashboard/diaries', diary.id]);
+    }
+  }
+
+  async toggleLock(diary: Diary) {
+    const user = this.authService.currentUser();
+    if (!user?.hasPin) {
+      this.alertService.error('PIN Required', 'Please set a security PIN in settings before locking items.');
+      return;
+    }
+
+    const newLockStatus = !diary.isLocked;
+    this.diaryService.updateDiary(diary.id, { isLocked: newLockStatus }).subscribe({
+      next: () => {
+        this.alertService.success(
+          newLockStatus ? 'Journal Locked' : 'Journal Unlocked',
+          `"${diary.name}" has been ${newLockStatus ? 'locked' : 'unlocked'}.`
+        );
+      }
+    });
   }
 
   async onDeleteDiary(diary: Diary) {
@@ -61,7 +125,7 @@ export class DiaryListComponent {
     if (this.diaryForm.invalid) return;
 
     this.isSubmitting.set(true);
-    const formValue = this.diaryForm.value as { name: string; description?: string };
+    const formValue = this.diaryForm.value as { name: string; description?: string; isLocked: boolean };
     const editingDiary = this.activeDiaryForEdit();
 
     if (editingDiary) {

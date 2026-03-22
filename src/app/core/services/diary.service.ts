@@ -40,7 +40,7 @@ export class DiaryService {
     );
   }
 
-  updateDiary(id: string, updates: { name?: string; description?: string }) {
+  updateDiary(id: string, updates: { name?: string; description?: string, isLocked?: boolean }) {
     return this.http.patch<Diary>(`${this.apiUrl}/${id}`, updates).pipe(
       tap(updatedDiary => {
         this.diaries.update(current => 
