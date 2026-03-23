@@ -85,11 +85,16 @@
             <lucide-icon [name]="'ChevronRight'" class="h-3.5 w-3.5 transition-transform duration-200" />
           </button>
           <span 
-            [routerLink]="['/dashboard/workspaces', workspace.id]"
-            routerLinkActive="active-nav-item"
-            class="text-[13px] font-semibold flex-1 px-1 py-0.5 rounded-md truncate transition-colors"
+            (click)="onWorkspaceClick(workspace)"
+            class="text-[13px] font-semibold flex-1 px-1 py-0.5 rounded-md truncate transition-colors flex items-center gap-1.5"
+            [class.active-nav-item]=""
             style="color: var(--text-secondary);"
-          >{{ workspace.name }}</span>
+          >
+            {{ workspace.name }}
+            @if (workspace.isLocked) {
+              <lucide-icon [name]="'Lock'" class="h-2.5 w-2.5" style="color: var(--accent);" />
+            }
+          </span>
           <button 
             (click)="$event.stopPropagation(); sidebarActions.openNotebookModal(workspace)"
             class="opacity-0 group-hover:opacity-100 p-1.5 rounded-md transition-all"
@@ -120,9 +125,9 @@
                     <lucide-icon [name]="'ChevronRight'" class="h-3 w-3 transition-transform duration-200" />
                   </button>
                   <div 
-                    [routerLink]="['/dashboard/notebooks', notebook.id]"
-                    routerLinkActive="active-nav-item"
+                    (click)="onNotebookClick(notebook, workspace)"
                     class="flex items-center gap-1.5 flex-1 px-1 py-0.5 rounded-md"
+                    [class.active-nav-item]="router.url.includes('/dashboard/notebooks/' + notebook.id)"
                   >
                     <lucide-icon [name]="'Notebook'" class="h-3.5 w-3.5 shrink-0" style="color: var(--accent);" />
                     <span class="text-xs font-medium truncate" style="color: var(--text-secondary);">{{ notebook.name }}</span>
@@ -142,16 +147,16 @@
                 @if (expandedNotebooks().has(notebook.id)) {
                   <div class="ml-4 mt-0.5 space-y-0.5 pl-2" style="border-left: 1px solid var(--border-subtle);">
                     @for (note of notebook.notes || []; track note.id) {
-                      <a 
-                        [routerLink]="['/dashboard/notes', note.id]"
-                        routerLinkActive="active-nav-item"
+                      <div 
+                        (click)="onNoteClick(note, notebook, workspace)"
                         class="flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer group transition-all"
+                        [class.active-nav-item]="router.url.includes('/dashboard/notes/' + note.id)"
                         (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
                         (mouseleave)="$any($event.currentTarget).style.background='transparent'"
                       >
                         <lucide-icon [name]="'FileText'" class="h-3 w-3 shrink-0 transition-colors" style="color: var(--text-muted);" />
                         <span class="text-[11px] truncate transition-colors" style="color: var(--text-muted);">{{ note.title || 'Untitled Note' }}</span>
-                      </a>
+                      </div>
                     }
                   </div>
                 }
@@ -190,13 +195,17 @@
           (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
           (mouseleave)="$any($event.currentTarget).style.background='transparent'"
         >
-          <lucide-icon [name]="'BookOpen'" class="h-3.5 w-3.5 shrink-0" style="color: var(--accent);" />
           <span 
-            [routerLink]="['/dashboard/diaries', diary.id]"
-            routerLinkActive="active-nav-item-purple"
-            class="text-[13px] font-medium flex-1 px-1 py-0.5 rounded-md truncate transition-colors"
+            (click)="onDiaryClick(diary)"
+            class="text-[13px] font-medium flex-1 px-1 py-0.5 rounded-md truncate transition-colors flex items-center gap-1.5"
+            [class.active-nav-item-purple]="router.url.includes('/dashboard/diaries/' + diary.id)"
             style="color: var(--text-secondary);"
-          >{{ diary.name }}</span>
+          >
+            {{ diary.name }}
+            @if (diary.isLocked) {
+              <lucide-icon [name]="'Lock'" class="h-2.5 w-2.5" style="color: var(--accent);" />
+            }
+          </span>
         </div>
       </div>
     }
@@ -223,17 +232,24 @@
 
     <!-- Story Items -->
     @for (story of storyService.stories(); track story.id) {
-      <div class="mb-0.5" [routerLink]="['/dashboard/stories', story.id]" routerLinkActive="active-nav-item-purple">
+      <div class="mb-0.5">
         <div 
+          (click)="onStoryClick(story)"
           class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer group transition-all"
+          [class.active-nav-item-purple]="router.url.includes('/dashboard/stories/' + story.id)"
           (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
           (mouseleave)="$any($event.currentTarget).style.background='transparent'"
         >
           <lucide-icon [name]="'StickyNote'" class="h-3.5 w-3.5 shrink-0" style="color: var(--accent);" />
           <span 
-            class="text-[13px] font-medium flex-1 px-1 py-0.5 rounded-md truncate transition-colors"
+            class="text-[13px] font-medium flex-1 px-1 py-0.5 rounded-md truncate transition-colors flex items-center gap-1.5"
             style="color: var(--text-secondary);"
-          >{{ story.title }}</span>
+          >
+            {{ story.title }}
+            @if (story.isLocked) {
+              <lucide-icon [name]="'Lock'" class="h-2.5 w-2.5" style="color: var(--accent);" />
+            }
+          </span>
         </div>
       </div>
     }

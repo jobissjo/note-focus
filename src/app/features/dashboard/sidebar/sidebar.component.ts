@@ -19,7 +19,7 @@ import { StoryService } from '../../../core/services/story.service';
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
-  private router = inject(Router);
+  public router = inject(Router);
   workspaceService = inject(WorkspaceService);
   notebookService = inject(NotebookService);
   noteService = inject(NoteService);
@@ -98,5 +98,75 @@ export class SidebarComponent implements OnInit {
     if (isExpanding) {
       this.notebookService.fetchNotesForNotebook(workspaceId, notebookId).subscribe();
     }
+  }
+
+  async onWorkspaceClick(workspace: any) {
+    if (workspace.isLocked) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Workspace Locked',
+        'Please enter your security PIN to access this workspace.'
+      );
+      if (isVerified) {
+        this.router.navigate(['/dashboard/workspaces', workspace.id]);
+      }
+    } else {
+      this.router.navigate(['/dashboard/workspaces', workspace.id]);
+    }
+  }
+
+  async onDiaryClick(diary: any) {
+    if (diary.isLocked) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Journal Locked',
+        'Please enter your security PIN to access this journal.'
+      );
+      if (isVerified) {
+        this.router.navigate(['/dashboard/diaries', diary.id]);
+      }
+    } else {
+      this.router.navigate(['/dashboard/diaries', diary.id]);
+    }
+  }
+
+  async onStoryClick(story: any) {
+    if (story.isLocked) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Story Locked',
+        'Please enter your security PIN to access this story.'
+      );
+      if (isVerified) {
+        this.router.navigate(['/dashboard/stories', story.id]);
+      }
+    } else {
+      this.router.navigate(['/dashboard/stories', story.id]);
+    }
+  }
+
+  async onNotebookClick(notebook: any, workspace: any) {
+    // If parent workspace is locked, protect it
+    if (workspace?.isLocked) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Workspace Locked',
+        'This notebook is in a locked workspace. Please verify your PIN.'
+      );
+      if (!isVerified) return;
+    }
+    this.router.navigate(['/dashboard/notebooks', notebook.id]);
+  }
+
+  async onNoteClick(note: any, notebook: any, workspace: any) {
+    // If parent workspace is locked, protect it
+    if (workspace?.isLocked) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Workspace Locked',
+        'This note is in a locked workspace. Please verify your PIN.'
+      );
+      if (!isVerified) return;
+    }
+    this.router.navigate(['/dashboard/notes', note.id]);
+  }
+
+  checkRoutesExistsWorspace(workspace: any){
+    return this.router.url.includes('/dashboard/workspaces/' + workspace.id)
   }
 }
