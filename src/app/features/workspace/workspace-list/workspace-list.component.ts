@@ -7,7 +7,6 @@ import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, Plus, LayoutGrid, List, Loader2, Trash2, Edit3, MoreVertical, Lock, Unlock, Pencil } from 'lucide-angular';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { AlertService } from '../../../core/services/alert.service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-workspace-list',
@@ -47,7 +46,15 @@ export class WorkspaceListComponent implements OnInit {
     this.showCreateModal.set(true);
   }
 
-  openEditModal(workspace: any) {
+  async openEditModal(workspace: any) {
+    if (workspace.isLocked) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Access Locked Workspace',
+        'Please enter your security PIN to edit this workspace.'
+      );
+      if (!isVerified) return;
+    }
+
     this.isEditMode.set(true);
     this.selectedWorkspaceId.set(workspace.id);
     this.workspaceForm.patchValue({
@@ -60,37 +67,14 @@ export class WorkspaceListComponent implements OnInit {
 
   async onWorkspaceClick(workspace: any) {
     if (workspace.isLocked) {
-      const isDark = document.documentElement.classList.contains('dark');
-      const { value: pin } = await Swal.fire({
-        title: 'Workspace Locked',
-        text: 'Please enter your security PIN to access this workspace.',
-        input: 'password',
-        inputPlaceholder: 'Enter PIN',
-        inputAttributes: {
-          maxlength: '10',
-          autocapitalize: 'off',
-          autocorrect: 'off'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Unlock',
-        confirmButtonColor: 'var(--accent)',
-        background: isDark ? '#171717' : '#ffffff',
-        color: isDark ? '#ffffff' : '#171717',
-        customClass: {
-          popup: 'rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl',
-          input: 'rounded-xl border border-neutral-200 dark:border-neutral-800'
-        }
-      });
-
-      if (pin) {
-        this.authService.verifyPin(pin).subscribe({
-          next: () => {
-            this.router.navigate(['/dashboard/workspaces', workspace.id]);
-          },
-          error: (err) => {
-            this.alertService.error('Invalid PIN', err.error?.message || 'Access denied.');
-          }
-        });
+      const isVerified = await this.authService.requestPinVerification(
+        'Workspace Locked',
+        'Please enter your security PIN to access this workspace.'
+      );
+      if (isVerified) {
+        this.router.navigate(['/dashboard/workspaces', workspace.id]);
+      } else {
+        this.alertService.error('Access Denied', 'Invalid PIN or verification cancelled.');
       }
     } else {
       this.router.navigate(['/dashboard/workspaces', workspace.id]);
@@ -102,6 +86,16 @@ export class WorkspaceListComponent implements OnInit {
     if (!user?.hasPin) {
       this.alertService.error('PIN Required', 'Please set a security PIN in settings before locking items.');
       return;
+    }
+
+    const isUnlocking = workspace.isLocked;
+    
+    if (isUnlocking) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Unlock Workspace',
+        'Please enter your security PIN to unlock this workspace.'
+      );
+      if (!isVerified) return;
     }
 
     const newLockStatus = !workspace.isLocked;

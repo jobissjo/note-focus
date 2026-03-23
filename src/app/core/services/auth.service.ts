@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { inject, Injectable, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -77,6 +78,39 @@ export class AuthService extends BaseApiService {
 
   verifyPin(pin: string) {
     return this.post<{ success: boolean }>('auth/verify-pin', { pin });
+  }
+
+  async requestPinVerification(title: string = 'Security PIN Required', text: string = 'Please enter your security PIN to proceed.'): Promise<boolean> {
+    const isDark = document.documentElement.classList.contains('dark');
+    const { value: pin } = await Swal.fire({
+      title,
+      text,
+      input: 'password',
+      inputPlaceholder: 'Enter PIN',
+      inputAttributes: {
+        maxlength: '10',
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonText: 'Verify',
+      confirmButtonColor: 'var(--accent)',
+      background: isDark ? '#171717' : '#ffffff',
+      color: isDark ? '#ffffff' : '#171717',
+      customClass: {
+        popup: 'rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl',
+        input: 'rounded-xl border border-neutral-200 dark:border-neutral-800'
+      }
+    });
+
+    if (!pin) return false;
+
+    return new Promise((resolve) => {
+      this.verifyPin(pin).subscribe({
+        next: (res) => resolve(res.success),
+        error: () => resolve(false)
+      });
+    });
   }
 
   // Optional: Check session on startup

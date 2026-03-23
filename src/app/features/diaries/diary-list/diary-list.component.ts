@@ -9,7 +9,6 @@ import { AlertService } from '../../../core/services/alert.service';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { Diary } from '../../../core/interfaces';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-diary-list',
@@ -40,7 +39,15 @@ export class DiaryListComponent {
     this.showCreateModal.set(true);
   }
 
-  openEditModal(diary: Diary) {
+  async openEditModal(diary: Diary) {
+    if (diary.isLocked) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Access Locked Journal',
+        'Please enter your security PIN to edit this journal.'
+      );
+      if (!isVerified) return;
+    }
+
     this.activeDiaryForEdit.set(diary);
     this.diaryForm.patchValue({
       name: diary.name,
@@ -52,37 +59,14 @@ export class DiaryListComponent {
 
   async onDiaryClick(diary: Diary) {
     if (diary.isLocked) {
-      const isDark = document.documentElement.classList.contains('dark');
-      const { value: pin } = await Swal.fire({
-        title: 'Journal Locked',
-        text: 'Please enter your security PIN to access this journal.',
-        input: 'password',
-        inputPlaceholder: 'Enter PIN',
-        inputAttributes: {
-          maxlength: '10',
-          autocapitalize: 'off',
-          autocorrect: 'off'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Unlock',
-        confirmButtonColor: 'var(--accent)',
-        background: isDark ? '#171717' : '#ffffff',
-        color: isDark ? '#ffffff' : '#171717',
-        customClass: {
-          popup: 'rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl',
-          input: 'rounded-xl border border-neutral-200 dark:border-neutral-800'
-        }
-      });
-
-      if (pin) {
-        this.authService.verifyPin(pin).subscribe({
-          next: () => {
-            this.router.navigate(['/dashboard/diaries', diary.id]);
-          },
-          error: (err) => {
-            this.alertService.error('Invalid PIN', err.error?.message || 'Access denied.');
-          }
-        });
+      const isVerified = await this.authService.requestPinVerification(
+        'Journal Locked',
+        'Please enter your security PIN to access this journal.'
+      );
+      if (isVerified) {
+        this.router.navigate(['/dashboard/diaries', diary.id]);
+      } else {
+        this.alertService.error('Access Denied', 'Invalid PIN or verification cancelled.');
       }
     } else {
       this.router.navigate(['/dashboard/diaries', diary.id]);
@@ -94,6 +78,16 @@ export class DiaryListComponent {
     if (!user?.hasPin) {
       this.alertService.error('PIN Required', 'Please set a security PIN in settings before locking items.');
       return;
+    }
+
+    const isUnlocking = diary.isLocked;
+    
+    if (isUnlocking) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Unlock Journal',
+        'Please enter your security PIN to unlock this journal.'
+      );
+      if (!isVerified) return;
     }
 
     const newLockStatus = !diary.isLocked;

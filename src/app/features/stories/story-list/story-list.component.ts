@@ -9,7 +9,6 @@ import { LucideAngularModule, BookOpen, Plus, Pencil, Trash2, CalendarDays, Book
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { Story } from '../../../core/interfaces';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-story-list',
@@ -55,7 +54,15 @@ export class StoryListComponent implements OnInit {
     this.showCreateModal.set(true);
   }
 
-  openEditModal(story: Story) {
+  async openEditModal(story: Story) {
+    if (story.isLocked) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Access Locked Story',
+        'Please enter your security PIN to edit this story.'
+      );
+      if (!isVerified) return;
+    }
+
     this.activeStoryForEdit.set(story);
     this.storyForm.patchValue({
       title: story.title,
@@ -66,37 +73,14 @@ export class StoryListComponent implements OnInit {
 
   async onStoryClick(story: Story) {
     if (story.isLocked) {
-      const isDark = document.documentElement.classList.contains('dark');
-      const { value: pin } = await Swal.fire({
-        title: 'Story Locked',
-        text: 'Please enter your security PIN to access this story.',
-        input: 'password',
-        inputPlaceholder: 'Enter PIN',
-        inputAttributes: {
-          maxlength: '10',
-          autocapitalize: 'off',
-          autocorrect: 'off'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Unlock',
-        confirmButtonColor: 'var(--accent)',
-        background: isDark ? '#171717' : '#ffffff',
-        color: isDark ? '#ffffff' : '#171717',
-        customClass: {
-          popup: 'rounded-3xl border border-neutral-200 dark:border-neutral-800 shadow-2xl',
-          input: 'rounded-xl border border-neutral-200 dark:border-neutral-800'
-        }
-      });
-
-      if (pin) {
-        this.authService.verifyPin(pin).subscribe({
-          next: () => {
-            this.router.navigate(['/dashboard/stories', story.id]);
-          },
-          error: (err) => {
-            this.alertService.error('Invalid PIN', err.error?.message || 'Access denied.');
-          }
-        });
+      const isVerified = await this.authService.requestPinVerification(
+        'Story Locked',
+        'Please enter your security PIN to access this story.'
+      );
+      if (isVerified) {
+        this.router.navigate(['/dashboard/stories', story.id]);
+      } else {
+        this.alertService.error('Access Denied', 'Invalid PIN or verification cancelled.');
       }
     } else {
       this.router.navigate(['/dashboard/stories', story.id]);
@@ -108,6 +92,16 @@ export class StoryListComponent implements OnInit {
     if (!user?.hasPin) {
       this.alertService.error('PIN Required', 'Please set a security PIN in settings before locking items.');
       return;
+    }
+
+    const isUnlocking = story.isLocked;
+    
+    if (isUnlocking) {
+      const isVerified = await this.authService.requestPinVerification(
+        'Unlock Story',
+        'Please enter your security PIN to unlock this story.'
+      );
+      if (!isVerified) return;
     }
 
     const newLockStatus = !story.isLocked;
