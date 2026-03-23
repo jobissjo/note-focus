@@ -87,7 +87,7 @@
           <span 
             (click)="onWorkspaceClick(workspace)"
             class="text-[13px] font-semibold flex-1 px-1 py-0.5 rounded-md truncate transition-colors flex items-center gap-1.5"
-            [class.active-nav-item]=""
+            [class.active-nav-item]="checkRoutesExistsWorspace(workspace)"
             style="color: var(--text-secondary);"
           >
             {{ workspace.name }}
