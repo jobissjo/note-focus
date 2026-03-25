@@ -30,8 +30,12 @@ export class DiaryListComponent {
   diaryForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     description: [''],
-    isLocked: [false]
+    isLocked: [false],
+    isHidden: [false]
   });
+
+  showHidden = signal(false);
+  currentPin = signal<string | null>(null);
 
   openCreateModal() {
     this.activeDiaryForEdit.set(null);
@@ -52,9 +56,36 @@ export class DiaryListComponent {
     this.diaryForm.patchValue({
       name: diary.name,
       description: diary.description || '',
-      isLocked: diary.isLocked || false
+      isLocked: diary.isLocked || false,
+      isHidden: diary.isHidden || false
     });
     this.showCreateModal.set(true);
+  }
+
+  async toggleHiddenItems() {
+    if (this.showHidden()) {
+      // Switch back to normal view
+      this.showHidden.set(false);
+      this.currentPin.set(null);
+      this.diaryService.fetchDiaries().subscribe();
+    } else {
+      // Request PIN to show hidden
+      const pin = await this.authService.requestPinConfirmation(
+        'Show Hidden Journals',
+        'Please enter your security PIN to view hidden items.'
+      );
+
+      if (pin) {
+        this.currentPin.set(pin);
+        this.showHidden.set(true);
+        this.diaryService.fetchDiaries(pin, true).subscribe({
+          error: () => {
+             this.showHidden.set(false);
+             this.currentPin.set(null);
+          }
+        });
+      }
+    }
   }
 
   async onDiaryClick(diary: Diary) {
@@ -119,7 +150,7 @@ export class DiaryListComponent {
     if (this.diaryForm.invalid) return;
 
     this.isSubmitting.set(true);
-    const formValue = this.diaryForm.value as { name: string; description?: string; isLocked: boolean };
+    const formValue = this.diaryForm.value as { name: string; description?: string; isLocked: boolean; isHidden: boolean };
     const editingDiary = this.activeDiaryForEdit();
 
     if (editingDiary) {

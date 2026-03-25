@@ -29,8 +29,12 @@ export class WorkspaceListComponent implements OnInit {
   workspaceForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     description: [''],
-    isLocked: [false]
+    isLocked: [false],
+    isHidden: [false]
   });
+
+  showHidden = signal(false);
+  currentPin = signal<string | null>(null);
 
   readonly Trash2 = Trash2;
   readonly Edit3 = Edit3;
@@ -60,9 +64,36 @@ export class WorkspaceListComponent implements OnInit {
     this.workspaceForm.patchValue({
       name: workspace.name,
       description: workspace.description || '',
-      isLocked: workspace.isLocked || false
+      isLocked: workspace.isLocked || false,
+      isHidden: workspace.isHidden || false
     });
     this.showCreateModal.set(true);
+  }
+
+  async toggleHiddenItems() {
+    if (this.showHidden()) {
+      // Switch back to normal view
+      this.showHidden.set(false);
+      this.currentPin.set(null);
+      this.workspaceService.getWorkspaces().subscribe();
+    } else {
+      // Request PIN to show hidden
+      const pin = await this.authService.requestPinConfirmation(
+        'Show Hidden Workspaces',
+        'Please enter your security PIN to view hidden items.'
+      );
+
+      if (pin) {
+        this.currentPin.set(pin);
+        this.showHidden.set(true);
+        this.workspaceService.getWorkspaces(pin, true).subscribe({
+          error: () => {
+             this.showHidden.set(false);
+             this.currentPin.set(null);
+          }
+        });
+      }
+    }
   }
 
   async onWorkspaceClick(workspace: any) {
@@ -124,8 +155,8 @@ export class WorkspaceListComponent implements OnInit {
       this.isSubmitting.set(true);
       
       // Ensure no unwanted data is passed to payload
-      const { name, description, isLocked } = this.workspaceForm.value;
-      const payload: any = { name, isLocked };
+      const { name, description, isLocked, isHidden } = this.workspaceForm.value;
+      const payload: any = { name, isLocked, isHidden };
       if (description) {
         payload.description = description;
       }

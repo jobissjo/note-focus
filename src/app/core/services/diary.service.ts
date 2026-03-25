@@ -16,8 +16,13 @@ export class DiaryService {
   diaries = signal<Diary[]>([]);
   activeDiary = signal<Diary | null>(null);
 
-  fetchDiaries() {
-    return this.http.get<Diary[]>(this.apiUrl).pipe(
+  fetchDiaries(pin?: string, hidden?: boolean) {
+    let url = this.apiUrl;
+    const params: any = {};
+    if (pin) params.pin = pin;
+    if (hidden) params.hidden = hidden;
+
+    return this.http.get<Diary[]>(url, { params }).pipe(
       tap(data => this.diaries.set(data))
     );
   }
@@ -32,7 +37,7 @@ export class DiaryService {
     );
   }
 
-  createDiary(diaryData: { name: string; description?: string }) {
+  createDiary(diaryData: { name: string; description?: string; isLocked?: boolean; isHidden?: boolean }) {
     return this.http.post<Diary>(this.apiUrl, diaryData).pipe(
       tap(newDiary => {
         this.diaries.update(current => [...current, newDiary]);
@@ -40,7 +45,7 @@ export class DiaryService {
     );
   }
 
-  updateDiary(id: string, updates: { name?: string; description?: string, isLocked?: boolean }) {
+  updateDiary(id: string, updates: { name?: string; description?: string, isLocked?: boolean, isHidden?: boolean }) {
     return this.http.patch<Diary>(`${this.apiUrl}/${id}`, updates).pipe(
       tap(updatedDiary => {
         this.diaries.update(current => 

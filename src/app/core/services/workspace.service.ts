@@ -11,8 +11,12 @@ export class WorkspaceService extends BaseApiService {
   workspaces = signal<Workspace[]>([]);
   activeWorkspace = signal<Workspace | null>(null);
 
-  getWorkspaces() {
-    return this.get<Workspace[]>('workspaces').pipe(
+  getWorkspaces(pin?: string, hidden?: boolean) {
+    const params: any = {};
+    if (pin) params.pin = pin;
+    if (hidden) params.hidden = hidden;
+    
+    return this.get<Workspace[]>('workspaces', params).pipe(
       tap(workspaces => this.workspaces.set(workspaces))
     );
   }

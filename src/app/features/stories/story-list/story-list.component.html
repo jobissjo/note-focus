@@ -10,14 +10,27 @@
       </div>
       <p class="text-sm" style="color: var(--text-muted);">Manage your personal stories and creative drafts.</p>
     </div>
-    <button 
-      (click)="openCreateModal()"
-      class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
-      style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
-    >
-      <lucide-icon [name]="'Plus'" class="h-4 w-4" />
-      <span>New Story</span>
-    </button>
+    <div class="flex items-center gap-3">
+      <button 
+        (click)="toggleHiddenItems()"
+        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95"
+        [style.background]="showHidden() ? 'var(--accent-soft)' : 'var(--bg-surface)'"
+        [style.color]="showHidden() ? 'var(--accent)' : 'var(--text-secondary)'"
+        [style.border]="'1px solid ' + (showHidden() ? 'var(--accent-border)' : 'var(--border-subtle)')"
+      >
+        <lucide-icon [name]="showHidden() ? 'Eye' : 'EyeOff'" class="h-4 w-4" />
+        <span>{{ showHidden() ? 'Hide Hidden' : 'Show Hidden' }}</span>
+      </button>
+
+      <button 
+        (click)="openCreateModal()"
+        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-95"
+        style="background: var(--accent); box-shadow: 0 4px 14px var(--accent-glow);"
+      >
+        <lucide-icon [name]="'Plus'" class="h-4 w-4" />
+        <span>New Story</span>
+      </button>
+    </div>
   </header>
 
   <!-- Create/Edit Modal -->
@@ -55,6 +68,30 @@
             <div 
               class="absolute top-0.5 left-0.5 bg-white h-4 w-4 rounded-full transition-transform shadow-sm"
               [class.translate-x-5]="storyForm.value.isLocked"
+            ></div>
+          </button>
+        </div>
+
+        <!-- Hidden Toggle -->
+        <div class="flex items-center justify-between p-4 rounded-xl" style="background: var(--bg-base); border: 1px solid var(--border-subtle);">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg flex items-center justify-center" [style.background]="storyForm.value.isHidden ? 'var(--accent-soft)' : 'var(--bg-surface)'">
+              <lucide-icon [name]="storyForm.value.isHidden ? 'EyeOff' : 'Eye'" class="h-4 w-4" [style.color]="storyForm.value.isHidden ? 'var(--accent)' : 'var(--text-muted)'" />
+            </div>
+            <div>
+              <p class="text-sm font-bold" style="color: var(--text-primary);">Hide Story</p>
+              <p class="text-[11px]" style="color: var(--text-muted);">Only visible when 'Show Hidden' is on</p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            (click)="storyForm.patchValue({ isHidden: !storyForm.value.isHidden })"
+            class="w-10 h-5 rounded-full transition-all relative shrink-0"
+            [style.background]="storyForm.value.isHidden ? 'var(--accent)' : 'var(--border-subtle)'"
+          >
+            <div 
+              class="absolute top-0.5 left-0.5 bg-white h-4 w-4 rounded-full transition-transform shadow-sm"
+              [class.translate-x-5]="storyForm.value.isHidden"
             ></div>
           </button>
         </div>
@@ -127,11 +164,18 @@
             style="background: var(--accent-soft);"
           >
             <lucide-icon [name]="'BookOpen'" class="h-5.5 w-5.5" style="color: var(--accent);" />
-            @if (story.isLocked) {
-              <div class="absolute -top-1 -right-1 h-5 w-5 rounded-full flex items-center justify-center bg-white shadow-sm border border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700">
-                <lucide-icon name="Lock" class="h-2.5 w-2.5" style="color: var(--accent);" />
-              </div>
-            }
+            <div class="absolute -top-1 -right-1 flex flex-col gap-0.5">
+              @if (story.isLocked) {
+                <div class="h-5 w-5 rounded-full flex items-center justify-center bg-white shadow-sm border border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700">
+                  <lucide-icon name="Lock" class="h-2.5 w-2.5" style="color: var(--accent);" />
+                </div>
+              }
+              @if (story.isHidden) {
+                <div class="h-5 w-5 rounded-full flex items-center justify-center bg-white shadow-sm border border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700">
+                  <lucide-icon name="EyeOff" class="h-2.5 w-2.5" style="color: var(--accent);" />
+                </div>
+              }
+            </div>
           </div>
           <!-- Title -->
           <h3 class="text-base font-bold mb-1 transition-colors group-hover:text-[var(--accent)]" style="color: var(--text-primary);">

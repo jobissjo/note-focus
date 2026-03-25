@@ -80,7 +80,7 @@ export class AuthService extends BaseApiService {
     return this.post<{ success: boolean }>('auth/verify-pin', { pin });
   }
 
-  async requestPinVerification(title: string = 'Security PIN Required', text: string = 'Please enter your security PIN to proceed.'): Promise<boolean> {
+  async requestPinConfirmation(title: string = 'Security PIN Required', text: string = 'Please enter your security PIN to proceed.'): Promise<string | null> {
     const isDark = document.documentElement.classList.contains('dark');
     const { value: pin } = await Swal.fire({
       title,
@@ -103,14 +103,21 @@ export class AuthService extends BaseApiService {
       }
     });
 
-    if (!pin) return false;
+    if (!pin) return null;
 
-    return new Promise((resolve) => {
+    const isVerified = await new Promise<boolean>((resolve) => {
       this.verifyPin(pin).subscribe({
         next: (res) => resolve(res.success),
         error: () => resolve(false)
       });
     });
+
+    return isVerified ? pin : null;
+  }
+
+  async requestPinVerification(title: string = 'Security PIN Required', text: string = 'Please enter your security PIN to proceed.'): Promise<boolean> {
+    const pin = await this.requestPinConfirmation(title, text);
+    return pin !== null;
   }
 
   // Optional: Check session on startup

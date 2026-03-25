@@ -30,8 +30,12 @@ export class StoryListComponent implements OnInit {
 
   storyForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(2)]],
-    isLocked: [false]
+    isLocked: [false],
+    isHidden: [false]
   });
+
+  showHidden = signal(false);
+  currentPin = signal<string | null>(null);
 
   readonly BookOpen = BookOpen;
   readonly Plus = Plus;
@@ -66,9 +70,36 @@ export class StoryListComponent implements OnInit {
     this.activeStoryForEdit.set(story);
     this.storyForm.patchValue({
       title: story.title,
-      isLocked: story.isLocked || false
+      isLocked: story.isLocked || false,
+      isHidden: story.isHidden || false
     });
     this.showCreateModal.set(true);
+  }
+
+  async toggleHiddenItems() {
+    if (this.showHidden()) {
+      // Switch back to normal view
+      this.showHidden.set(false);
+      this.currentPin.set(null);
+      this.storyService.getStories().subscribe();
+    } else {
+      // Request PIN to show hidden
+      const pin = await this.authService.requestPinConfirmation(
+        'Show Hidden Stories',
+        'Please enter your security PIN to view hidden items.'
+      );
+
+      if (pin) {
+        this.currentPin.set(pin);
+        this.showHidden.set(true);
+        this.storyService.getStories(pin, true).subscribe({
+          error: () => {
+             this.showHidden.set(false);
+             this.currentPin.set(null);
+          }
+        });
+      }
+    }
   }
 
   async onStoryClick(story: Story) {
@@ -118,11 +149,11 @@ export class StoryListComponent implements OnInit {
   onSubmit() {
     if (this.storyForm.valid) {
       this.isSubmitting.set(true);
-      const { title, isLocked } = this.storyForm.value;
+      const { title, isLocked, isHidden } = this.storyForm.value;
       const storyToEdit = this.activeStoryForEdit();
 
       if (storyToEdit) {
-        this.storyService.updateStory(storyToEdit.id, { title: title!, isLocked: isLocked! }).subscribe({
+        this.storyService.updateStory(storyToEdit.id, { title: title!, isLocked: isLocked!, isHidden: isHidden! }).subscribe({
           next: () => {
             this.isSubmitting.set(false);
             this.showCreateModal.set(false);
@@ -132,7 +163,7 @@ export class StoryListComponent implements OnInit {
       } else {
         // New story with default empty content
         const emptyContent = { type: 'doc', content: [] };
-        this.storyService.createStory(title!, emptyContent).subscribe({
+        this.storyService.createStory({ title: title!, content: emptyContent, isLocked: isLocked!, isHidden: isHidden! }).subscribe({
           next: () => {
             this.isSubmitting.set(false);
             this.showCreateModal.set(false);

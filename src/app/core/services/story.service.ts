@@ -10,8 +10,12 @@ export class StoryService extends BaseApiService {
   stories = signal<Story[]>([]);
   activeStory = signal<Story | null>(null);
 
-  getStories() {
-    return this.get<Story[]>('stories').pipe(
+  getStories(pin?: string, hidden?: boolean) {
+    const params: any = {};
+    if (pin) params.pin = pin;
+    if (hidden) params.hidden = hidden;
+
+    return this.get<Story[]>('stories', params).pipe(
       tap((stories) => this.stories.set(stories))
     );
   }
@@ -22,8 +26,8 @@ export class StoryService extends BaseApiService {
     );
   }
 
-  createStory(title: string, content: any) {
-    return this.post<Story>('stories', { title, content }).pipe(
+  createStory(storyData: { title: string; content: any; isLocked?: boolean; isHidden?: boolean }) {
+    return this.post<Story>('stories', storyData).pipe(
       tap((newStory) => {
         this.stories.update((prev) => [newStory, ...prev]);
         this.activeStory.set(newStory);

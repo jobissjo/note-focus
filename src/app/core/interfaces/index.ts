@@ -15,6 +15,7 @@ export interface Workspace {
   emoji?: string;
   ownerId: string;
   isLocked: boolean;
+  isHidden: boolean;
   notebooks?: Notebook[];
   createdAt: string;
   updatedAt: string;
@@ -52,6 +53,7 @@ export interface Diary {
   description?: string;
   ownerId: string;
   isLocked: boolean;
+  isHidden: boolean;
   entries?: DiaryEntry[];
   createdAt: string; // ISO String
   updatedAt: string; // ISO String
@@ -74,6 +76,7 @@ export interface Story {
   emoji?: string;
   createdById: string;
   isLocked: boolean;
+  isHidden: boolean;
   createdAt: string;
   updatedAt: string;
 }
