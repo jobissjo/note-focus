@@ -44,6 +44,10 @@ import {
   Zap,
   Star,
   TrendingUp,
+  CheckCircle,
+  Shield,
+  Layout,
+  PenTool,
   Unlock
 } from 'lucide-angular';
 
@@ -93,5 +97,9 @@ export const ICONS = {
   Zap,
   Star,
   TrendingUp,
+  CheckCircle,
+  Shield,
+  Layout,
+  PenTool,
   Unlock
 };

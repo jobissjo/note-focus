@@ -48,7 +48,7 @@ export class AuthService extends BaseApiService {
     }
     this.currentUser.set(null);
     this.isAuthenticated.set(false);
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/']);
   }
 
   private handleAuthSub(res: AuthResponse) {

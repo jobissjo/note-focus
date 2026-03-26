@@ -5,8 +5,8 @@ import { noAuthGuard } from './core/guards/no-auth.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
-    pathMatch: 'full'
+    canActivate: [noAuthGuard],
+    loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
   },
   {
     path: 'auth',
