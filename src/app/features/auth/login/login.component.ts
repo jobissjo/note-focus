@@ -1,9 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { LucideAngularModule, Mail, Lock, Loader2 } from 'lucide-angular';
 import { CommonModule } from '@angular/common';
+
+import { Title, Meta } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +13,15 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule, ReactiveFormsModule, RouterModule, LucideAngularModule],
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  private title = inject(Title);
+  private meta = inject(Meta);
+  
+  ngOnInit(): void {
+    this.title.setTitle('Login | NoteFocus');
+    this.meta.updateTag({ name: 'description', content: 'Securely login to your NoteFocus account and access your personal workspaces and journals.' });
+  }
+
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   

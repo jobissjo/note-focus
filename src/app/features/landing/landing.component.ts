@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { LucideAngularModule, CheckCircle, Zap, Shield, Layout, PenTool, BookOpen } from 'lucide-angular';
 
 @Component({
@@ -10,13 +11,22 @@ import { LucideAngularModule, CheckCircle, Zap, Shield, Layout, PenTool, BookOpe
   templateUrl: './landing.component.html',
   styleUrls: ['./landing.component.css']
 })
-export class LandingComponent {
+export class LandingComponent implements OnInit {
+  private title = inject(Title);
+  private meta = inject(Meta);
+
   readonly CheckCircle = CheckCircle;
   readonly Zap = Zap;
   readonly Shield = Shield;
   readonly Layout = Layout;
   readonly PenTool = PenTool;
   readonly BookOpen = BookOpen;
+
+  ngOnInit(): void {
+    this.title.setTitle('NoteFocus | Where Focus Meets Flow State');
+    this.meta.updateTag({ name: 'description', content: 'Capture your thoughts, manage projects, and write stories in a workspace designed for minimalists.' });
+    this.meta.updateTag({ name: 'keywords', content: 'minimalist notes, secure notebook, privacy journal, story writing software, hierarchical notes' });
+  }
 
   features = [
     {

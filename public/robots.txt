@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Allow: /auth/login
+Allow: /auth/register
+Disallow: /dashboard/*
+
+Sitemap: https://notefocus.app/sitemap.xml
