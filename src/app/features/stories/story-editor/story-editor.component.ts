@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Save, Clock, Trash2, Maximize2, Share2, Loader2, ChevronLeft, Sparkles } from 'lucide-angular';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-story-editor',
@@ -22,6 +23,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   storyService = inject(StoryService);
   private alertService = inject(AlertService);
+  authService = inject(AuthService);
   isBrowser = isPlatformBrowser(this.platformId);
 
   private destroy$ = new Subject<void>();
@@ -94,11 +96,21 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
 
   onContentChange(newContent: any) {
     this.content.set(newContent);
-    this.saveSubject.next({ content: newContent });
+    if (this.authService.currentUser()?.autoSaveEnabled) {
+      this.saveSubject.next({ content: newContent });
+    }
   }
 
   updateTitle(newTitle: string) {
-    this.saveSubject.next({ title: newTitle });
+    if (this.authService.currentUser()?.autoSaveEnabled) {
+      this.saveSubject.next({ title: newTitle });
+    }
+  }
+
+  manualSave() {
+    const story = this.storyService.activeStory();
+    if (!story) return;
+    this.saveStory({ title: (document.querySelector('input[placeholder="Untitled Story"]') as HTMLInputElement)?.value, content: this.content() });
   }
 
   async onDeleteStory() {

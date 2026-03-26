@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule, Save, Clock, Trash2, Maximize2, Share2, Loader2, ChevronRight } from 'lucide-angular';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { AlertService } from '../../../core/services/alert.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-note-editor',
@@ -24,6 +25,7 @@ export class NoteEditorComponent implements OnInit, OnDestroy {
   noteService = inject(NoteService);
   breadcrumbService = inject(BreadcrumbService);
   private alertService = inject(AlertService);
+  authService = inject(AuthService);
   isBrowser = isPlatformBrowser(this.platformId);
 
   private destroy$ = new Subject<void>();
@@ -97,11 +99,21 @@ export class NoteEditorComponent implements OnInit, OnDestroy {
 
   onContentChange(newContent: any) {
     this.content.set(newContent);
-    this.saveSubject.next({ content: newContent });
+    if (this.authService.currentUser()?.autoSaveEnabled) {
+      this.saveSubject.next({ content: newContent });
+    }
   }
 
   updateTitle(newTitle: string) {
-    this.saveSubject.next({ title: newTitle });
+    if (this.authService.currentUser()?.autoSaveEnabled) {
+      this.saveSubject.next({ title: newTitle });
+    }
+  }
+
+  manualSave() {
+    const note = this.noteService.activeNote();
+    if (!note) return;
+    this.saveNote({ title: (document.querySelector('input[placeholder="Untitled Note"]') as HTMLInputElement)?.value, content: this.content() });
   }
 
   async onDeleteNote() {

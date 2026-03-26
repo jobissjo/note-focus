@@ -118,6 +118,38 @@ import Swal from 'sweetalert2';
           </div>
         </section>
 
+
+        <!-- Editor Settings -->
+        <section class="rounded-2xl p-6 transition-all" style="
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          box-shadow: var(--shadow-sm);
+        ">
+          <h2 class="text-sm font-bold flex items-center gap-2 mb-5" style="color: var(--text-primary);">
+            <div class="h-7 w-7 rounded-lg flex items-center justify-center" style="background: var(--accent-soft);">
+              <lucide-icon name="FileText" class="h-3.5 w-3.5" style="color: var(--accent);" />
+            </div>
+            Editor
+          </h2>
+
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-semibold" style="color: var(--text-primary);">Auto-save</h3>
+              <p class="text-xs mt-0.5" style="color: var(--text-muted);">Automatically save your notes as you type</p>
+            </div>
+            <button 
+              (click)="toggleAutoSave()"
+              class="w-12 h-6 rounded-full transition-all relative shrink-0"
+              [style.background]="authService.currentUser()?.autoSaveEnabled ? 'var(--accent)' : 'var(--border-subtle)'"
+            >
+              <div 
+                class="absolute top-0.5 left-0.5 bg-white h-5 w-5 rounded-full transition-transform shadow-sm"
+                [class.translate-x-6]="authService.currentUser()?.autoSaveEnabled"
+              ></div>
+            </button>
+          </div>
+        </section>
+
         <!-- Notifications (Coming Soon) -->
         <section class="rounded-2xl p-6 transition-all" style="
           background: var(--bg-surface);
@@ -195,5 +227,17 @@ export class SettingsComponent {
         }
       });
     }
+  }
+
+  toggleAutoSave() {
+    const currentState = !!this.authService.currentUser()?.autoSaveEnabled;
+    this.authService.setAutoSave(!currentState).subscribe({
+      next: (res) => {
+        this.alertService.success('Settings Updated', `Auto-save is now ${res.autoSaveEnabled ? 'enabled' : 'disabled'}.`);
+      },
+      error: (err) => {
+        this.alertService.error('Error', err.error?.message || 'Failed to update auto-save setting.');
+      }
+    });
   }
 }

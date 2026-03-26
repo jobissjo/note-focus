@@ -6,6 +6,7 @@ export interface User {
   avatar?: string;
   name?: string;
   hasPin?: boolean;
+  autoSaveEnabled?: boolean;
 }
 
 export interface Workspace {

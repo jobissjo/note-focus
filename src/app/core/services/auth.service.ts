@@ -80,6 +80,24 @@ export class AuthService extends BaseApiService {
     return this.post<{ success: boolean }>('auth/verify-pin', { pin });
   }
 
+  setAutoSave(enabled: boolean) {
+    return this.post<{ success: boolean; autoSaveEnabled: boolean }>(
+      'auth/auto-save', 
+      { enabled }
+    ).pipe(
+      tap((res) => {
+        const user = this.currentUser();
+        if (user) {
+          const updatedUser = { ...user, autoSaveEnabled: res.autoSaveEnabled };
+          this.currentUser.set(updatedUser);
+          if (this.isBrowser) {
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        }
+      })
+    );
+  }
+
   async requestPinConfirmation(title: string = 'Security PIN Required', text: string = 'Please enter your security PIN to proceed.'): Promise<string | null> {
     const isDark = document.documentElement.classList.contains('dark');
     const { value: pin } = await Swal.fire({

@@ -9,6 +9,7 @@ import { AlertService } from '../../../core/services/alert.service';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { DiaryEntry } from '../../../core/interfaces';
 import { Editor, NgxEditorModule, Toolbar } from 'ngx-editor';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-diary-detail',
@@ -25,6 +26,7 @@ export class DiaryDetailComponent implements OnInit, OnDestroy {
   diaryService = inject(DiaryService);
   diaryEntryService = inject(DiaryEntryService);
   private alertService = inject(AlertService);
+  authService = inject(AuthService);
 
   isBrowser = isPlatformBrowser(this.platformId);
 
@@ -90,19 +92,39 @@ export class DiaryDetailComponent implements OnInit, OnDestroy {
     const entry = this.diaryEntryService.activeEntry();
     if (!entry) return;
 
-    if (this.timeoutRef) clearTimeout(this.timeoutRef);
+    // Update local state so manual save has the latest content
+    entry.content = newContent;
+
+    if (this.authService.currentUser()?.autoSaveEnabled) {
+      if (this.timeoutRef) clearTimeout(this.timeoutRef);
+      
+      this.isSaving.set(true);
+      
+      this.timeoutRef = setTimeout(() => {
+        this.diaryEntryService.updateEntry(entry.id, { content: newContent }).subscribe({
+          next: () => this.isSaving.set(false),
+          error: () => {
+            this.isSaving.set(false);
+            this.alertService.error('Save Failed', 'Could not save the entry.');
+          }
+        });
+      }, 1000);
+    }
+  }
+
+  manualSave() {
+    const entry = this.diaryEntryService.activeEntry();
+    if (!entry) return;
     
     this.isSaving.set(true);
-    
-    this.timeoutRef = setTimeout(() => {
-      this.diaryEntryService.updateEntry(entry.id, { content: newContent }).subscribe({
-        next: () => this.isSaving.set(false),
-        error: () => {
-          this.isSaving.set(false);
-          this.alertService.error('Save Failed', 'Could not save the entry.');
-        }
-      });
-    }, 1000);
+    const content = this.diaryEntryService.activeEntry()?.content;
+    this.diaryEntryService.updateEntry(entry.id, { content }).subscribe({
+      next: () => this.isSaving.set(false),
+      error: () => {
+        this.isSaving.set(false);
+        this.alertService.error('Save Failed', 'Could not save the entry.');
+      }
+    });
   }
 
   openCreateEntryModal() {

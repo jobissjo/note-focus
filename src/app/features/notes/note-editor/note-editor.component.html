@@ -42,10 +42,27 @@
           class="h-3.5 w-3.5"
           [style.color]="isSaving() ? 'var(--text-muted)' : '#22c55e'"
         />
-        <span>{{ isSaving() ? 'Saving...' : 'Saved' }}</span>
+        <span>{{ isSaving() ? 'Saving...' : (authService.currentUser()?.autoSaveEnabled ? 'Auto-save' : 'Manual Save') }}</span>
       </div>
 
       <div class="w-px h-4" style="background: var(--border-subtle);"></div>
+
+      <button 
+        (click)="manualSave()"
+        class="p-2 rounded-lg transition-all flex items-center justify-center relative group"
+        [style.color]="authService.currentUser()?.autoSaveEnabled ? 'var(--text-muted)' : 'var(--accent)'"
+        (mouseenter)="$any($event.currentTarget).style.background='var(--bg-base)'"
+        (mouseleave)="$any($event.currentTarget).style.background='transparent'"
+        [title]="authService.currentUser()?.autoSaveEnabled ? 'Manual save (auto-save is on)' : 'Save changes'"
+      >
+        <lucide-icon [name]="'Save'" class="h-4 w-4" />
+        @if (!authService.currentUser()?.autoSaveEnabled && !isSaving()) {
+          <span class="absolute -top-1 -right-1 flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+          </span>
+        }
+      </button>
 
       <button class="p-2 rounded-lg transition-all"
         style="color: var(--text-muted);"
