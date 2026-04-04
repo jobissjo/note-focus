@@ -96,6 +96,54 @@
           </button>
         </div>
 
+        <!-- Public Toggle -->
+        <div class="flex items-center justify-between p-4 rounded-xl" style="background: var(--bg-base); border: 1px solid var(--border-subtle);">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg flex items-center justify-center" [style.background]="storyForm.value.isPublic ? 'var(--accent-soft)' : 'var(--bg-surface)'">
+              <lucide-icon [name]="storyForm.value.isPublic ? 'Share2' : 'Shield'" class="h-4 w-4" [style.color]="storyForm.value.isPublic ? 'var(--accent)' : 'var(--text-muted)'" />
+            </div>
+            <div>
+              <p class="text-sm font-bold" style="color: var(--text-primary);">Make Public</p>
+              <p class="text-[11px]" style="color: var(--text-muted);">Shareable by link when enabled</p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            (click)="storyForm.patchValue({ isPublic: !storyForm.value.isPublic })"
+            class="w-10 h-5 rounded-full transition-all relative shrink-0"
+            [style.background]="storyForm.value.isPublic ? 'var(--accent)' : 'var(--border-subtle)'"
+          >
+            <div 
+              class="absolute top-0.5 left-0.5 bg-white h-4 w-4 rounded-full transition-transform shadow-sm"
+              [class.translate-x-5]="storyForm.value.isPublic"
+            ></div>
+          </button>
+        </div>
+
+        <!-- Publish Toggle -->
+        <div class="flex items-center justify-between p-4 rounded-xl" style="background: var(--bg-base); border: 1px solid var(--border-subtle);">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg flex items-center justify-center" [style.background]="storyForm.value.isPublished ? 'var(--accent-soft)' : 'var(--bg-surface)'">
+              <lucide-icon [name]="storyForm.value.isPublished ? 'CheckCircle2' : 'Clock'" class="h-4 w-4" [style.color]="storyForm.value.isPublished ? 'var(--accent)' : 'var(--text-muted)'" />
+            </div>
+            <div>
+              <p class="text-sm font-bold" style="color: var(--text-primary);">{{ storyForm.value.isPublished ? 'Published' : 'Draft' }}</p>
+              <p class="text-[11px]" style="color: var(--text-muted);">Toggle visibility status</p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            (click)="storyForm.patchValue({ isPublished: !storyForm.value.isPublished })"
+            class="w-10 h-5 rounded-full transition-all relative shrink-0"
+            [style.background]="storyForm.value.isPublished ? 'var(--accent)' : 'var(--border-subtle)'"
+          >
+            <div 
+              class="absolute top-0.5 left-0.5 bg-white h-4 w-4 rounded-full transition-transform shadow-sm"
+              [class.translate-x-5]="storyForm.value.isPublished"
+            ></div>
+          </button>
+        </div>
+
         <div class="flex items-center gap-3 pt-2">
           <button 
             type="button"
@@ -160,7 +208,7 @@
 
         <div (click)="onStoryClick(story)">
           <!-- Icon -->
-          <div class="h-11 w-11 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-105 duration-200 relative"
+            <div class="h-11 w-11 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-105 duration-200 relative"
             style="background: var(--accent-soft);"
           >
             <lucide-icon [name]="'BookOpen'" class="h-5.5 w-5.5" style="color: var(--accent);" />
@@ -175,6 +223,11 @@
                   <lucide-icon name="EyeOff" class="h-2.5 w-2.5" style="color: var(--accent);" />
                 </div>
               }
+              @if (story.isPublic) {
+                <div class="h-5 w-5 rounded-full flex items-center justify-center bg-white shadow-sm border border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700">
+                  <lucide-icon name="Share2" class="h-2.5 w-2.5" style="color: var(--accent);" />
+                </div>
+              }
             </div>
           </div>
           <!-- Title -->
@@ -182,9 +235,13 @@
             {{ story.title }}
           </h3>
           <!-- Meta -->
-          <div class="flex items-center gap-1.5 text-[11px] font-medium mt-4" style="color: var(--text-muted);">
+          <div class="flex items-center gap-1.5 text-[11px] font-medium mt-4 flex-wrap" style="color: var(--text-muted);">
             <lucide-icon [name]="'CalendarDays'" class="h-3 w-3" />
             <span>Updated {{ story.updatedAt | date:'mediumDate' }}</span>
+            <span class="mx-1">•</span>
+            <span>{{ story.isPublished ? 'Published' : 'Draft' }}</span>
+            <span class="mx-1">•</span>
+            <span>{{ story.isPublic ? 'Public' : 'Private' }}</span>
           </div>
         </div>
       </div>

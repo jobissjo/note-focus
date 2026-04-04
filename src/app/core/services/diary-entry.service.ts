@@ -36,7 +36,7 @@ export class DiaryEntryService {
     );
   }
 
-  createEntry(diaryId: string, entryData: { date: string; title?: string; content: any }) {
+  createEntry(diaryId: string, entryData: { date: string; title?: string; content: any; isPublished?: boolean }) {
     return this.http.post<DiaryEntry>(`${environment.apiUrl}/diaries/${diaryId}/entries`, entryData).pipe(
       tap(newEntry => {
         // Assuming we want to maintain sorting by date descending here
@@ -49,7 +49,7 @@ export class DiaryEntryService {
     );
   }
 
-  updateEntry(id: string, updates: { date?: string; title?: string; content?: any }) {
+  updateEntry(id: string, updates: { date?: string; title?: string; content?: any; isPublished?: boolean }) {
     return this.http.patch<DiaryEntry>(`${environment.apiUrl}/diary-entries/${id}`, updates).pipe(
       tap(updatedEntry => {
         this.entries.update(current => {

@@ -37,7 +37,7 @@ export class DiaryService {
     );
   }
 
-  createDiary(diaryData: { name: string; description?: string; isLocked?: boolean; isHidden?: boolean }) {
+  createDiary(diaryData: { name: string; description?: string; isLocked?: boolean; isHidden?: boolean; isPublic?: boolean }) {
     return this.http.post<Diary>(this.apiUrl, diaryData).pipe(
       tap(newDiary => {
         this.diaries.update(current => [...current, newDiary]);
@@ -45,7 +45,7 @@ export class DiaryService {
     );
   }
 
-  updateDiary(id: string, updates: { name?: string; description?: string, isLocked?: boolean, isHidden?: boolean }) {
+  updateDiary(id: string, updates: { name?: string; description?: string, isLocked?: boolean, isHidden?: boolean, isPublic?: boolean }) {
     return this.http.patch<Diary>(`${this.apiUrl}/${id}`, updates).pipe(
       tap(updatedDiary => {
         this.diaries.update(current => 

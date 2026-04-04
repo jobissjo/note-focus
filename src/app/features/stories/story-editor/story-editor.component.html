@@ -28,6 +28,29 @@
       </div>
   
       <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2">
+          <button 
+            (click)="togglePublished()"
+            class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1"
+            [style.background]="storyService.activeStory()?.isPublished ? 'var(--accent-soft)' : 'var(--bg-base)'"
+            [style.color]="storyService.activeStory()?.isPublished ? 'var(--accent)' : 'var(--text-secondary)'"
+            [disabled]="publishInFlight()"
+          >
+            <lucide-icon [name]="storyService.activeStory()?.isPublished ? 'CheckCircle2' : 'Clock'" class="h-3.5 w-3.5" />
+            <span>{{ storyService.activeStory()?.isPublished ? 'Published' : 'Draft' }}</span>
+          </button>
+          <button 
+            (click)="togglePublic()"
+            class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1"
+            [style.background]="storyService.activeStory()?.isPublic ? 'var(--accent-soft)' : 'var(--bg-base)'"
+            [style.color]="storyService.activeStory()?.isPublic ? 'var(--accent)' : 'var(--text-secondary)'"
+            [disabled]="visibilityInFlight()"
+          >
+            <lucide-icon [name]="storyService.activeStory()?.isPublic ? 'Share2' : 'Shield'" class="h-3.5 w-3.5" />
+            <span>{{ storyService.activeStory()?.isPublic ? 'Public' : 'Private' }}</span>
+          </button>
+        </div>
+
         <div class="flex items-center gap-2 mr-4 text-[11px] font-medium transition-all duration-300" 
              [style.opacity]="isSaving() ? '1' : '0.5'"
              style="color: var(--text-muted);">

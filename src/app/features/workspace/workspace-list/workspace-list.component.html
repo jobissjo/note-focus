@@ -109,6 +109,30 @@
             ></div>
           </button>
         </div>
+
+        <!-- Public Toggle -->
+        <div class="flex items-center justify-between p-4 rounded-xl" style="background: var(--bg-base); border: 1px solid var(--border-subtle);">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg flex items-center justify-center" [style.background]="workspaceForm.value.isPublic ? 'var(--accent-soft)' : 'var(--bg-surface)'">
+              <lucide-icon [name]="workspaceForm.value.isPublic ? 'Share2' : 'Shield'" class="h-4 w-4" [style.color]="workspaceForm.value.isPublic ? 'var(--accent)' : 'var(--text-muted)'" />
+            </div>
+            <div>
+              <p class="text-sm font-bold" style="color: var(--text-primary);">Make Public</p>
+              <p class="text-[11px]" style="color: var(--text-muted);">Shareable by link when enabled</p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            (click)="workspaceForm.patchValue({ isPublic: !workspaceForm.value.isPublic })"
+            class="w-10 h-5 rounded-full transition-all relative shrink-0"
+            [style.background]="workspaceForm.value.isPublic ? 'var(--accent)' : 'var(--border-subtle)'"
+          >
+            <div 
+              class="absolute top-0.5 left-0.5 bg-white h-4 w-4 rounded-full transition-transform shadow-sm"
+              [class.translate-x-5]="workspaceForm.value.isPublic"
+            ></div>
+          </button>
+        </div>
         <div class="flex items-center gap-3 pt-2">
           <button 
             type="button"
@@ -196,6 +220,11 @@
                   <lucide-icon name="EyeOff" class="h-2.5 w-2.5" style="color: var(--accent);" />
                 </div>
               }
+              @if (workspace.isPublic) {
+                <div class="h-5 w-5 rounded-full flex items-center justify-center bg-white shadow-sm border border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700">
+                  <lucide-icon name="Share2" class="h-2.5 w-2.5" style="color: var(--accent);" />
+                </div>
+              }
             </div>
           </div>
           <!-- Name -->
@@ -210,6 +239,8 @@
           <div class="flex items-center gap-1.5 text-[11px] font-medium" style="color: var(--text-muted);">
             <lucide-icon [name]="'LayoutGrid'" class="h-3 w-3" />
             <span>{{ (workspace.notebooks || []).length }} {{ (workspace.notebooks || []).length === 1 ? 'Notebook' : 'Notebooks' }}</span>
+            <span class="mx-1">•</span>
+            <span>{{ workspace.isPublic ? 'Public' : 'Private' }}</span>
           </div>
         </div>
       </div>

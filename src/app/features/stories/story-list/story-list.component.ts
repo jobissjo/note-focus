@@ -31,7 +31,9 @@ export class StoryListComponent implements OnInit {
   storyForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(2)]],
     isLocked: [false],
-    isHidden: [false]
+    isHidden: [false],
+    isPublic: [false],
+    isPublished: [false]
   });
 
   showHidden = signal(false);
@@ -71,7 +73,9 @@ export class StoryListComponent implements OnInit {
     this.storyForm.patchValue({
       title: story.title,
       isLocked: story.isLocked || false,
-      isHidden: story.isHidden || false
+      isHidden: story.isHidden || false,
+      isPublic: story.isPublic || false,
+      isPublished: story.isPublished || false
     });
     this.showCreateModal.set(true);
   }
@@ -149,11 +153,11 @@ export class StoryListComponent implements OnInit {
   onSubmit() {
     if (this.storyForm.valid) {
       this.isSubmitting.set(true);
-      const { title, isLocked, isHidden } = this.storyForm.value;
+      const { title, isLocked, isHidden, isPublic, isPublished } = this.storyForm.value;
       const storyToEdit = this.activeStoryForEdit();
 
       if (storyToEdit) {
-        this.storyService.updateStory(storyToEdit.id, { title: title!, isLocked: isLocked!, isHidden: isHidden! }).subscribe({
+        this.storyService.updateStory(storyToEdit.id, { title: title!, isLocked: isLocked!, isHidden: isHidden!, isPublic: isPublic!, isPublished: isPublished! }).subscribe({
           next: () => {
             this.isSubmitting.set(false);
             this.showCreateModal.set(false);
@@ -163,7 +167,7 @@ export class StoryListComponent implements OnInit {
       } else {
         // New story with default empty content
         const emptyContent = { type: 'doc', content: [] };
-        this.storyService.createStory({ title: title!, content: emptyContent, isLocked: isLocked!, isHidden: isHidden! }).subscribe({
+        this.storyService.createStory({ title: title!, content: emptyContent, isLocked: isLocked!, isHidden: isHidden!, isPublic: isPublic!, isPublished: isPublished! }).subscribe({
           next: () => {
             this.isSubmitting.set(false);
             this.showCreateModal.set(false);

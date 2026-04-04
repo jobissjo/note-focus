@@ -1,0 +1,30 @@
+<div class="max-w-4xl mx-auto px-6 py-10" style="font-family: var(--font-sans);">
+  @if (loading()) {
+    <p class="text-sm" style="color: var(--text-muted);">Loading story...</p>
+  } @else if (!story()) {
+    <p class="text-sm" style="color: var(--text-muted);">Story not found.</p>
+  } @else {
+    <div class="flex items-start gap-4 mb-6">
+      <div class="h-11 w-11 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+        <lucide-icon [name]="'Sparkles'" class="h-5 w-5" style="color: var(--accent);" />
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs uppercase font-semibold tracking-widest mb-1" style="color: var(--text-muted);">Public Story</p>
+        <h1 class="text-2xl font-bold" style="color: var(--text-primary);">{{ story()?.title }}</h1>
+        <div class="flex items-center gap-2 text-[11px]" style="color: var(--text-muted);">
+          <span>Updated {{ story()?.updatedAt | date:'medium' }}</span>
+          <span>•</span>
+          <span>{{ story()?.isPublished ? 'Published' : 'Draft' }}</span>
+          <span>•</span>
+          <span>{{ story()?.isPublic ? 'Public' : 'Private' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-5 rounded-2xl" style="background: var(--bg-surface); border: 1px solid var(--border-subtle);">
+      <pre class="text-sm whitespace-pre-wrap" style="color: var(--text-primary);">
+{{ story()?.content | json }}
+      </pre>
+    </div>
+  }
+</div>

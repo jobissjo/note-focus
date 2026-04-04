@@ -30,7 +30,8 @@ export class WorkspaceListComponent implements OnInit {
     name: ['', [Validators.required, Validators.minLength(2)]],
     description: [''],
     isLocked: [false],
-    isHidden: [false]
+    isHidden: [false],
+    isPublic: [false]
   });
 
   showHidden = signal(false);
@@ -65,7 +66,8 @@ export class WorkspaceListComponent implements OnInit {
       name: workspace.name,
       description: workspace.description || '',
       isLocked: workspace.isLocked || false,
-      isHidden: workspace.isHidden || false
+      isHidden: workspace.isHidden || false,
+      isPublic: workspace.isPublic || false
     });
     this.showCreateModal.set(true);
   }
@@ -156,7 +158,8 @@ export class WorkspaceListComponent implements OnInit {
       
       // Ensure no unwanted data is passed to payload
       const { name, description, isLocked, isHidden } = this.workspaceForm.value;
-      const payload: any = { name, isLocked, isHidden };
+      const { isPublic } = this.workspaceForm.value;
+      const payload: any = { name, isLocked, isHidden, isPublic };
       if (description) {
         payload.description = description;
       }

@@ -26,7 +26,7 @@ export class StoryService extends BaseApiService {
     );
   }
 
-  createStory(storyData: { title: string; content: any; isLocked?: boolean; isHidden?: boolean }) {
+  createStory(storyData: { title: string; content: any; isLocked?: boolean; isHidden?: boolean; isPublic?: boolean; isPublished?: boolean }) {
     return this.post<Story>('stories', storyData).pipe(
       tap((newStory) => {
         this.stories.update((prev) => [newStory, ...prev]);

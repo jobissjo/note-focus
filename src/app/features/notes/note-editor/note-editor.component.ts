@@ -52,6 +52,7 @@ export class NoteEditorComponent implements OnInit, OnDestroy {
   readonly Maximize2 = Maximize2;
   readonly Share2 = Share2;
   readonly Loader2 = Loader2;
+  publishInFlight = signal(false);
 
   ngOnInit(): void {
     if (this.isBrowser) {
@@ -114,6 +115,17 @@ export class NoteEditorComponent implements OnInit, OnDestroy {
     const note = this.noteService.activeNote();
     if (!note) return;
     this.saveNote({ title: (document.querySelector('input[placeholder="Untitled Note"]') as HTMLInputElement)?.value, content: this.content() });
+  }
+
+  togglePublished() {
+    const note = this.noteService.activeNote();
+    if (!note) return;
+    const next = !note.isPublished;
+    this.publishInFlight.set(true);
+    this.noteService.updateNote(note.id, note.notebookId, '', { isPublished: next }).subscribe({
+      next: () => this.publishInFlight.set(false),
+      error: () => this.publishInFlight.set(false)
+    });
   }
 
   async onDeleteNote() {

@@ -43,6 +43,9 @@
               <div class="text-sm font-semibold line-clamp-1" style="color: var(--text-primary);">
                 {{ entry.title || 'Untitled Entry' }}
               </div>
+              <div class="text-[10px] font-semibold mt-1" [style.color]="entry.isPublished ? 'var(--accent)' : 'var(--text-muted)'">
+                {{ entry.isPublished ? 'Published' : 'Draft' }}
+              </div>
             </div>
             <!-- Actions -->
             <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 shrink-0 pt-0.5">
@@ -126,6 +129,16 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <button 
+            (click)="toggleActiveEntryPublished()"
+            class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1"
+            [style.background]="diaryEntryService.activeEntry()?.isPublished ? 'var(--accent-soft)' : 'var(--bg-base)'"
+            [style.color]="diaryEntryService.activeEntry()?.isPublished ? 'var(--accent)' : 'var(--text-secondary)'"
+          >
+            <lucide-icon [name]="diaryEntryService.activeEntry()?.isPublished ? 'CheckCircle2' : 'Clock'" class="h-3.5 w-3.5" />
+            <span>{{ diaryEntryService.activeEntry()?.isPublished ? 'Published' : 'Draft' }}</span>
+          </button>
+
           <button 
             (click)="manualSave()"
             class="p-2 rounded-lg transition-all flex items-center justify-center relative group"
@@ -211,6 +224,29 @@
             class="w-full rounded-xl py-3 px-4 outline-none transition-all text-sm"
             style="background: var(--bg-base); border: 1px solid var(--border-subtle); color: var(--text-primary); font-family: var(--font-sans);"
           />
+        </div>
+
+        <div class="flex items-center justify-between p-4 rounded-xl" style="background: var(--bg-base); border: 1px solid var(--border-subtle);">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 rounded-lg flex items-center justify-center" [style.background]="entryModalForm.value.isPublished ? 'var(--accent-soft)' : 'var(--bg-surface)'">
+              <lucide-icon [name]="entryModalForm.value.isPublished ? 'CheckCircle2' : 'Clock'" class="h-4 w-4" [style.color]="entryModalForm.value.isPublished ? 'var(--accent)' : 'var(--text-muted)'" />
+            </div>
+            <div>
+              <p class="text-sm font-bold" style="color: var(--text-primary);">{{ entryModalForm.value.isPublished ? 'Published' : 'Draft' }}</p>
+              <p class="text-[11px]" style="color: var(--text-muted);">Publish entry for sharing</p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            (click)="entryModalForm.patchValue({ isPublished: !entryModalForm.value.isPublished })"
+            class="w-10 h-5 rounded-full transition-all relative shrink-0"
+            [style.background]="entryModalForm.value.isPublished ? 'var(--accent)' : 'var(--border-subtle)'"
+          >
+            <div 
+              class="absolute top-0.5 left-0.5 bg-white h-4 w-4 rounded-full transition-transform shadow-sm"
+              [class.translate-x-5]="entryModalForm.value.isPublished"
+            ></div>
+          </button>
         </div>
 
         <div class="flex items-center gap-3 pt-2">

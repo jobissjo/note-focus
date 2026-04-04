@@ -52,6 +52,8 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   readonly Loader2 = Loader2;
   readonly ChevronLeft = ChevronLeft;
   readonly Sparkles = Sparkles;
+  publishInFlight = signal(false);
+  visibilityInFlight = signal(false);
 
   ngOnInit(): void {
     if (this.isBrowser) {
@@ -111,6 +113,28 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     const story = this.storyService.activeStory();
     if (!story) return;
     this.saveStory({ title: (document.querySelector('input[placeholder="Untitled Story"]') as HTMLInputElement)?.value, content: this.content() });
+  }
+
+  togglePublished() {
+    const story = this.storyService.activeStory();
+    if (!story) return;
+    const next = !story.isPublished;
+    this.publishInFlight.set(true);
+    this.storyService.updateStory(story.id, { isPublished: next }).subscribe({
+      next: () => this.publishInFlight.set(false),
+      error: () => this.publishInFlight.set(false)
+    });
+  }
+
+  togglePublic() {
+    const story = this.storyService.activeStory();
+    if (!story) return;
+    const next = !story.isPublic;
+    this.visibilityInFlight.set(true);
+    this.storyService.updateStory(story.id, { isPublic: next }).subscribe({
+      next: () => this.visibilityInFlight.set(false),
+      error: () => this.visibilityInFlight.set(false)
+    });
   }
 
   async onDeleteStory() {

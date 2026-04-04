@@ -31,7 +31,8 @@ export class DiaryListComponent {
     name: ['', [Validators.required, Validators.minLength(2)]],
     description: [''],
     isLocked: [false],
-    isHidden: [false]
+    isHidden: [false],
+    isPublic: [false]
   });
 
   showHidden = signal(false);
@@ -57,7 +58,8 @@ export class DiaryListComponent {
       name: diary.name,
       description: diary.description || '',
       isLocked: diary.isLocked || false,
-      isHidden: diary.isHidden || false
+      isHidden: diary.isHidden || false,
+      isPublic: diary.isPublic || false
     });
     this.showCreateModal.set(true);
   }
@@ -150,7 +152,7 @@ export class DiaryListComponent {
     if (this.diaryForm.invalid) return;
 
     this.isSubmitting.set(true);
-    const formValue = this.diaryForm.value as { name: string; description?: string; isLocked: boolean; isHidden: boolean };
+    const formValue = this.diaryForm.value as { name: string; description?: string; isLocked: boolean; isHidden: boolean; isPublic: boolean };
     const editingDiary = this.activeDiaryForEdit();
 
     if (editingDiary) {

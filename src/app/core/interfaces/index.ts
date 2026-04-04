@@ -17,6 +17,7 @@ export interface Workspace {
   ownerId: string;
   isLocked: boolean;
   isHidden: boolean;
+  isPublic: boolean;
   notebooks?: Notebook[];
   createdAt: string;
   updatedAt: string;
@@ -38,6 +39,7 @@ export interface Note {
   content: any; // JSON based rich text
   emoji?: string;
   notebookId: string;
+  isPublished: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -55,6 +57,7 @@ export interface Diary {
   ownerId: string;
   isLocked: boolean;
   isHidden: boolean;
+  isPublic: boolean;
   entries?: DiaryEntry[];
   createdAt: string; // ISO String
   updatedAt: string; // ISO String
@@ -66,6 +69,7 @@ export interface DiaryEntry {
   content: any; // JSON object representing rich text
   date: string; // ISO String representing the entry's logical date
   diaryId: string;
+  isPublished: boolean;
   createdAt: string; 
   updatedAt: string;
 }
@@ -78,6 +82,8 @@ export interface Story {
   createdById: string;
   isLocked: boolean;
   isHidden: boolean;
+  isPublic: boolean;
+  isPublished: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,0 +1,51 @@
+<div class="max-w-5xl mx-auto px-6 py-10" style="font-family: var(--font-sans);">
+  @if (loading()) {
+    <p class="text-sm" style="color: var(--text-muted);">Loading journal...</p>
+  } @else if (!journal()) {
+    <p class="text-sm" style="color: var(--text-muted);">Journal not found.</p>
+  } @else {
+    <div class="flex items-start gap-4 mb-8">
+      <div class="h-12 w-12 rounded-2xl flex items-center justify-center" style="background: var(--accent-soft);">
+        <lucide-icon [name]="'BookOpen'" class="h-5 w-5" style="color: var(--accent);" />
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-xs uppercase font-semibold tracking-widest mb-1" style="color: var(--text-muted);">Public Journal</p>
+        <h1 class="text-2xl font-bold" style="color: var(--text-primary);">{{ journal()?.name }}</h1>
+        <p class="text-sm" style="color: var(--text-secondary);">{{ journal()?.description || 'No description provided.' }}</p>
+        <div class="flex items-center gap-2 mt-2 text-[11px]" style="color: var(--text-muted);">
+          <span>Updated {{ journal()?.updatedAt | date:'medium' }}</span>
+          <span>•</span>
+          <span>Public</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      @for (entry of entries(); track entry.id) {
+        <div class="p-4 rounded-2xl" style="background: var(--bg-surface); border: 1px solid var(--border-subtle);">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <lucide-icon [name]="'CalendarDays'" class="h-4 w-4" style="color: var(--accent);" />
+              <span class="text-sm font-semibold" style="color: var(--text-primary);">
+                {{ entry.date | date:'fullDate' }}
+              </span>
+            </div>
+            <span class="text-[11px] font-semibold px-2 py-1 rounded-lg" style="background: var(--accent-soft); color: var(--accent);">
+              {{ entry.isPublished ? 'Published' : 'Draft' }}
+            </span>
+          </div>
+          <p class="text-sm font-semibold mb-2" style="color: var(--text-primary);">{{ entry.title || 'Untitled Entry' }}</p>
+          <pre class="text-xs whitespace-pre-wrap" style="color: var(--text-secondary); background: var(--bg-base); border: 1px solid var(--border-subtle); padding: 12px; border-radius: 12px; max-height: 240px; overflow: auto;">
+{{ entry.content | json }}
+          </pre>
+        </div>
+      }
+
+      @if (entries().length === 0) {
+        <div class="py-12 text-center border border-dashed rounded-2xl" style="border-color: var(--border-subtle);">
+          <p class="text-sm" style="color: var(--text-muted);">No entries shared for this journal.</p>
+        </div>
+      }
+    </div>
+  }
+</div>

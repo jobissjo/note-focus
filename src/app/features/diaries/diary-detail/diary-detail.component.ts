@@ -50,7 +50,8 @@ export class DiaryDetailComponent implements OnInit, OnDestroy {
 
   entryModalForm = this.fb.group({
     title: [''],
-    date: [this.getTodayDateString(), [Validators.required]]
+    date: [this.getTodayDateString(), [Validators.required]],
+    isPublished: [false]
   });
 
   private timeoutRef: any;
@@ -129,7 +130,7 @@ export class DiaryDetailComponent implements OnInit, OnDestroy {
 
   openCreateEntryModal() {
     this.activeEntryForEdit.set(null);
-    this.entryModalForm.reset({ date: this.getTodayDateString(), title: '' });
+    this.entryModalForm.reset({ date: this.getTodayDateString(), title: '', isPublished: false });
     this.showEntryModal.set(true);
   }
 
@@ -137,7 +138,8 @@ export class DiaryDetailComponent implements OnInit, OnDestroy {
     this.activeEntryForEdit.set(entry);
     this.entryModalForm.patchValue({
       title: entry.title || '',
-      date: new Date(entry.date).toISOString().split('T')[0]
+      date: new Date(entry.date).toISOString().split('T')[0],
+      isPublished: entry.isPublished ?? false
     });
     this.showEntryModal.set(true);
   }
@@ -169,7 +171,8 @@ export class DiaryDetailComponent implements OnInit, OnDestroy {
     if (editingEntry) {
       this.diaryEntryService.updateEntry(editingEntry.id, {
         title: formValue.title || undefined,
-        date: new Date(formValue.date ?? this.getTodayDateString()).toISOString()
+        date: new Date(formValue.date ?? this.getTodayDateString()).toISOString(),
+        isPublished: formValue.isPublished ?? false
       }).subscribe({
         next: () => {
           this.isSubmitting.set(false);
@@ -185,7 +188,8 @@ export class DiaryDetailComponent implements OnInit, OnDestroy {
       this.diaryEntryService.createEntry(currDiary.id, {
         title: formValue.title || undefined,
         date: new Date(formValue.date ?? this.getTodayDateString()).toISOString(),
-        content: { type: 'doc', content: [] }
+        content: { type: 'doc', content: [] },
+        isPublished: formValue.isPublished ?? false
       }).subscribe({
         next: () => {
           this.isSubmitting.set(false);
@@ -198,5 +202,12 @@ export class DiaryDetailComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  toggleActiveEntryPublished() {
+    const entry = this.diaryEntryService.activeEntry();
+    if (!entry) return;
+    const next = !entry.isPublished;
+    this.diaryEntryService.updateEntry(entry.id, { isPublished: next }).subscribe();
   }
 }

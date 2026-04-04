@@ -9,6 +9,17 @@ export const routes: Routes = [
     loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent)
   },
   {
+    path: 'public',
+    loadChildren: () => [
+      { path: 'journals', loadComponent: () => import('./features/public/public-journals/public-journals.component').then(m => m.PublicJournalsComponent) },
+      { path: 'journals/:id', loadComponent: () => import('./features/public/public-journal-detail/public-journal-detail.component').then(m => m.PublicJournalDetailComponent) },
+      { path: 'notes', loadComponent: () => import('./features/public/public-notes/public-notes.component').then(m => m.PublicNotesComponent) },
+      { path: 'notes/:id', loadComponent: () => import('./features/public/public-note-detail/public-note-detail.component').then(m => m.PublicNoteDetailComponent) },
+      { path: 'stories', loadComponent: () => import('./features/public/public-stories/public-stories.component').then(m => m.PublicStoriesComponent) },
+      { path: 'stories/:id', loadComponent: () => import('./features/public/public-story-detail/public-story-detail.component').then(m => m.PublicStoryDetailComponent) }
+    ]
+  },
+  {
     path: 'auth',
     canActivate: [noAuthGuard],
     loadChildren: () => [

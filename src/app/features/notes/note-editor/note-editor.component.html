@@ -34,6 +34,17 @@
     </div>
 
     <div class="flex items-center gap-1.5 shrink-0">
+      <button 
+        (click)="togglePublished()"
+        class="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1"
+        [style.background]="noteService.activeNote()?.isPublished ? 'var(--accent-soft)' : 'var(--bg-base)'"
+        [style.color]="noteService.activeNote()?.isPublished ? 'var(--accent)' : 'var(--text-secondary)'"
+        [disabled]="publishInFlight()"
+      >
+        <lucide-icon [name]="noteService.activeNote()?.isPublished ? 'CheckCircle2' : 'Clock'" class="h-3.5 w-3.5" />
+        <span>{{ noteService.activeNote()?.isPublished ? 'Published' : 'Draft' }}</span>
+      </button>
+
       <!-- Save status -->
       <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" style="background: var(--bg-base); color: var(--text-muted);">
         <lucide-icon 

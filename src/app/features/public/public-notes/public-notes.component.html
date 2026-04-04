@@ -1,0 +1,46 @@
+<div class="max-w-5xl mx-auto px-6 py-10" style="font-family: var(--font-sans);">
+  <header class="mb-8 flex items-center justify-between">
+    <div>
+      <p class="text-xs uppercase font-semibold tracking-widest" style="color: var(--text-muted);">Public</p>
+      <h1 class="text-2xl font-bold" style="color: var(--text-primary);">Notes</h1>
+      <p class="text-sm" style="color: var(--text-muted);">Browse published notes.</p>
+    </div>
+    <div class="h-10 w-10 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+      <lucide-icon [name]="'StickyNote'" class="h-5 w-5" style="color: var(--accent);" />
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="text-sm" style="color: var(--text-muted);">Loading public notes...</p>
+  } @else if (notes().length === 0) {
+    <div class="py-16 text-center border border-dashed rounded-2xl" style="border-color: var(--border-subtle);">
+      <p class="text-sm" style="color: var(--text-muted);">No public notes yet.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      @for (note of notes(); track note.id) {
+        <a [routerLink]="['/public/notes', note.id]"
+           class="block p-5 rounded-2xl transition-all"
+           style="background: var(--bg-surface); border: 1px solid var(--border-subtle); box-shadow: var(--shadow-sm); color: inherit; text-decoration: none;">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <div class="h-9 w-9 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+                <lucide-icon [name]="'StickyNote'" class="h-4 w-4" style="color: var(--accent);" />
+              </div>
+              <div>
+                <h3 class="font-bold" style="color: var(--text-primary);">{{ note.title || 'Untitled Note' }}</h3>
+                <p class="text-xs" style="color: var(--text-muted);">{{ note.updatedAt | date:'mediumDate' }}</p>
+              </div>
+            </div>
+            <span class="text-[11px] font-semibold px-2 py-1 rounded-lg" style="background: var(--accent-soft); color: var(--accent);">
+              {{ note.isPublished ? 'Published' : 'Draft' }}
+            </span>
+          </div>
+          <p class="text-sm line-clamp-2" style="color: var(--text-secondary);">
+            {{ (note.content | json | slice:0:200) || '' }}{{ ((note.content | json) || '').length > 200 ? '…' : '' }}
+          </p>
+        </a>
+      }
+    </div>
+  }
+</div>
